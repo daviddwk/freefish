@@ -51,15 +51,17 @@ fn main() {
         }
     }
     
-    if help_arg {
-        println!("help");
-    } else if list_arg {
-        println!("list");
-    }
+    let mut tank: Tank = Tank::new("tank".to_string());
+    let mut fish: Fish = Fish::new("fish".to_string(), (2, 3));
 
-    println!("{:#?}", fish_args);
-    println!("{}", tank_arg);
-    println!("{}", speed_arg);
-
-    let mut fish: Fish = Fish::new("fish".to_string(), (0, 0));
+    //loop {
+        print!("\x1B[2J\x1B[1;1H");
+        for i in 0..tank.size.0 {
+            for j in 0..tank.size.1 {
+                print!("{}", tank.anim[tank.frame][i].as_bytes()[j]);
+            }
+            print!("\n");
+        } 
+    //}
+    
 }

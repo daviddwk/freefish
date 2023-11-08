@@ -6,21 +6,35 @@ pub struct Fish {
     size: (usize, usize),
     flip: bool,
     frame: usize,
-    fish_chars: Vec<Vec<String>>,
-    flip_chars: Vec<Vec<String>>,
+    fish_anim: Vec<Vec<String>>,
+    flip_anim: Vec<Vec<String>>,
 }
 
 impl Fish {
     pub fn new(name: String, position: (usize, usize)) -> Self {
+        let (fish_frames, fish_num_lines, fish_num_chars) = load_file(name.clone() + ".fish");
+        let (flip_frames, flip_num_lines, flip_num_chars) = load_file(name.clone() + ".flip");
+        if fish_num_lines != flip_num_lines || flip_num_chars != flip_num_chars {
+            panic!("{} mismatch fish and flip size", name);
+        }
+        if fish_frames.len() != flip_frames.len(){
+            panic!("{} mismatch fish and flip number of frames", name);
+        }
         return Self {
             pos: position, // rand input
             dest: position,
-            size: (0, 0), // load
+            size: (fish_num_lines, fish_num_chars), // load
             flip: false,
             frame: 0, // rand
-            fish_chars: load_file(name.clone() + ".fish"), //load
-            flip_chars: load_file(name.clone() + ".flip"), //load
+            fish_anim: fish_frames, //load
+            flip_anim: flip_frames, //load
         }
+    }
+    pub fn update(&mut self) {
+        self.frame += 1;
+        if self.frame == self.fish_anim.len() {
+            self.frame = 0;
+        } 
     }
 }
 
