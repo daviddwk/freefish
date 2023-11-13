@@ -24,26 +24,28 @@ fn main() {
         } else if arg.eq("-l") {
             list_arg = true;
         } else if arg.eq("-s") {
-            if let Some(next_arg) = args_iter.next() {
-                if next_arg.chars().next() != Some('-') {
-                    arg = next_arg;
+            let mut tmp_args_iter = args_iter.clone();
+            if let Some(arg) = tmp_args_iter.next() {
+                if arg.chars().next() != Some('-') {
+                    args_iter.next();
                     speed_arg = arg.clone();
                 }
             }
         } else if arg.eq("-t") {
-            if let Some(next_arg) = args_iter.next() {
-                if next_arg.chars().next() != Some('-') {
-                    arg = next_arg;
+            let mut tmp_args_iter = args_iter.clone();
+            if let Some(arg) = tmp_args_iter.next() {
+                if arg.chars().next() != Some('-') {
+                    args_iter.next();
                     tank_arg = arg.clone();
                 }
             }
         } else if arg.eq("-f") {
-            while let Some(next_arg) = args_iter.next() {
-                if next_arg.chars().next() == Some('-') {
-                    break;
+            let mut tmp_args_iter = args_iter.clone();
+            while let Some(arg) = tmp_args_iter.next() {
+                if arg.chars().next() != Some('-') {
+                    args_iter.next();
+                    fish_args.push(arg.clone()); 
                 }
-                arg = next_arg;
-                fish_args.push(arg.clone()); 
             }
         } else {
             println!("invalid argument {}", arg);
@@ -51,17 +53,25 @@ fn main() {
         }
     }
     
-    let mut tank: Tank = Tank::new("tank".to_string());
-    let mut fish: Fish = Fish::new("fish".to_string(), (2, 3));
+    if help_arg {
+        println!("Help text");
+        std::process::exit(0);
+    }
 
+    let tank: Tank = Tank::new(tank_arg);
+    let mut fishies: Vec<Fish> = Vec::new();
+    for arg in fish_args {
+        fishies.push(Fish::new(arg, (0, 0)));
+    }
+    
     //loop {
-        print!("\x1B[2J\x1B[1;1H");
-        for i in 0..tank.size.0 {
-            for j in 0..tank.size.1 {
-                print!("{}", tank.anim[tank.frame][i].as_bytes()[j]);
-            }
-            print!("\n");
-        } 
+    //    print!("\x1B[2J\x1B[1;1H");
+    //    for i in 0..tank.size.0 {
+    //        for j in 0..tank.size.1 {
+    //            print!("{}", tank.anim[tank.frame][i].as_bytes()[j]);
+    //        }
+    //        print!("\n");
+    //    } 
     //}
     
 }
