@@ -8,7 +8,7 @@ pub struct Tank {
 
 impl Tank {
     pub fn new(name: String) -> Self {
-        let (tank_frames, tank_num_lines, tank_num_chars) = load_file(name + ".tank");
+        let tank_frames = load_file(name + ".tank");
         return Self {
             size: (tank_frames[0].len(), tank_frames[0][0].len()),
             frame: 0,

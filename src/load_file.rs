@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-pub fn load_file(name: String) -> (Vec<Vec<String>>, usize, usize) {    
+pub fn load_file(name: String) -> Vec<Vec<String>> {    
     let mut i: usize = 0;
     let mut file_out = Vec::new();
     let mut file_loc = name.clone() + &i.to_string();
@@ -41,7 +41,7 @@ pub fn load_file(name: String) -> (Vec<Vec<String>>, usize, usize) {
             }
         }
     }
-    return (file_out, num_lines, num_chars);
+    return file_out;
 }
 
 fn read_lines<P>(file_name: P) -> io::Result<io::Lines<io::BufReader<File>>>

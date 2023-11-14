@@ -20,7 +20,7 @@ fn main() {
     
     let mut args_iter = args.iter().skip(1);
 
-    while let Some(mut arg) = args_iter.next() {
+    while let Some(arg) = args_iter.next() {
         if arg.eq("-h") {
             help_arg = true;
         } else if arg.eq("-l") {
