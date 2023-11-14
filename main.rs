@@ -63,15 +63,22 @@ fn main() {
     for arg in fish_args {
         fishies.push(Fish::new(arg, (0, 0)));
     }
-    
-    //loop {
-    //    print!("\x1B[2J\x1B[1;1H");
-    //    for i in 0..tank.size.0 {
-    //        for j in 0..tank.size.1 {
-    //            print!("{}", tank.anim[tank.frame][i].as_bytes()[j]);
-    //        }
-    //        print!("\n");
-    //    } 
-    //}
-    
+     
+    print!("\x1B[2J\x1B[1;1H");
+    for row_idx in 0..tank.size.0 {
+        for glyph_idx in 0..tank.size.1 {
+            let mut printed = false;
+            for fish_xd in 0..fishies.len() {
+                if let Some(glyph) = fishies[0].get_glyph(row_idx, glyph_idx) {
+                    print!{"{}", glyph};
+                    printed = true;
+                    break;
+                }
+            }
+            if !printed {
+                print!("{}", tank.anim[tank.frame][row_idx].chars().nth(glyph_idx).unwrap());
+            }
+        }
+        print!("\n");
+    }  
 }

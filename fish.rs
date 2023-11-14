@@ -4,6 +4,7 @@ pub struct Fish {
     pos: (usize, usize),
     dest: (usize, usize),
     size: (usize, usize),
+    tank_size: (usize, usize),
     flip: bool,
     frame: usize,
     fish_anim: Vec<Vec<String>>,
@@ -35,6 +36,13 @@ impl Fish {
         if self.frame == self.fish_anim.len() {
             self.frame = 0;
         } 
+    }
+
+    pub fn get_glyph(&mut self, row_idx: usize, glyph_idx: usize) -> Option<char> {
+        if row_idx >= self.size.0 || glyph_idx >= self.size.1 {
+            return None;
+        }
+        return Some(self.fish_anim[0][row_idx].chars().nth(glyph_idx).unwrap());
     }
 }
 
