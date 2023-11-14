@@ -1,0 +1,7 @@
+[package]
+name = "freefish"
+version = "0.0.1"
+include = ["*.rs"]
+
+[dependencies]
+rand = "0.8.5"
