@@ -21,8 +21,8 @@ pub struct Fish {
     tank_size: (usize, usize),
     flip: bool,
     frame: usize,
-    fish_anim: Vec<Vec<String>>,
-    flip_anim: Vec<Vec<String>>,
+    fish_anim: Vec<Vec<Vec<ColorGlyph>>>,
+    flip_anim: Vec<Vec<Vec<ColorGlyph>>>,
 }
 
 impl Fish {
@@ -71,9 +71,7 @@ impl Fish {
         }
     }
 
-    pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<ColorGlyph> {
-
-        static foreground_color: Option<Color> = None;
+    pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<&ColorGlyph> {
 
         if row_idx >= self.size.0 + self.pos.0 || row_idx < self.pos.0 ||
            glyph_idx >= self.size.1 + self.pos.1 || glyph_idx < self.pos.1
@@ -81,22 +79,18 @@ impl Fish {
             return None;
         }
 
-        let glyph_char: char;
+        let glyph: &ColorGlyph;
         if self.flip {
-            glyph_char = self.flip_anim[self.frame][row_idx - self.pos.0].chars().nth(glyph_idx - self.pos.1).unwrap();
+            glyph = &self.flip_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1];
         } else {
-            glyph_char = self.fish_anim[self.frame][row_idx - self.pos.0].chars().nth(glyph_idx - self.pos.1).unwrap();
+            glyph = &self.fish_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1];
         }
 
-        if glyph_char == ' '  {
+        if glyph.glyph == ' '  {
             return None;
         }
 
-        return Some(ColorGlyph{
-            glyph: glyph_char,
-            foreground_color: Some(Color::Green),
-            background_color: None,
-        });
+        return Some(glyph);
     }
 }
 

@@ -1,9 +1,10 @@
 use load_file::*;
+use color_glyph::ColorGlyph;
 
 pub struct Tank {
     pub size: (usize, usize),
     pub frame: usize,
-    pub anim: Vec<Vec<String>>,
+    pub anim: Vec<Vec<Vec<ColorGlyph>>>,
 }
 
 impl Tank {

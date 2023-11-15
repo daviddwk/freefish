@@ -1,23 +1,60 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+use color_glyph::*;
+use crossterm::{
+    ExecutableCommand,
+    cursor::{Hide, MoveTo},
+    terminal::Clear,
+    style::{Color, SetForegroundColor, SetBackgroundColor}
+};
 
-pub fn load_file(name: String) -> Vec<Vec<String>> {    
+pub fn load_file(name: String) -> Vec<Vec<Vec<ColorGlyph>>> {    
     let mut i: usize = 0;
-    let mut file_out = Vec::new();
+    let mut file_out: Vec<Vec<Vec<ColorGlyph>>> = Vec::new();
     let mut file_loc = name.clone() + &i.to_string();
     let mut file_path = Path::new(&file_loc);
     let mut empty: bool = true;
-    while file_path.exists() { 
+    println!("{}", file_path.display());
+    while file_path.exists() {
+        let mut curr_fg_color: Option<Color> = None;
         if let Ok(lines) = read_lines(file_path) {
-            let mut frame = Vec::new();
+            let mut new_frame: Vec<Vec<ColorGlyph>> = Vec::new();
             for line in lines {
-                if let Ok(l) = line {
-                    frame.push(l);
-                    empty = false;
-                } 
+                let mut new_line: Vec<ColorGlyph> = Vec::new();
+                let chars = line.unwrap().to_string();
+                let mut char_idx = 0;
+                while char_idx < chars.len() {
+                    if chars.chars().nth(char_idx).unwrap() == '\\' {
+                        char_idx += 1;
+                        if let Some(escape) = chars.chars().nth(char_idx) {
+                            match escape{
+                                'd'=>curr_fg_color = None,
+                                'r'=>curr_fg_color = Some(Color::Red),
+                                'g'=>curr_fg_color = Some(Color::Green),
+                                'y'=>curr_fg_color = Some(Color::Yellow),
+                                'b'=>curr_fg_color = Some(Color::Blue),
+                                'm'=>curr_fg_color = Some(Color::Magenta),
+                                'c'=>curr_fg_color = Some(Color::Cyan),
+                                'w'=>curr_fg_color = Some(Color::White),
+                                _=>panic!("invalid escape code {}", escape),
+                            }
+                            println!("Color {}", escape);
+                        }
+                    } else {
+                        empty = false;
+                        println!("push");
+                        new_line.push(ColorGlyph{
+                                glyph: chars.chars().nth(char_idx).unwrap(),
+                                foreground_color: curr_fg_color,
+                                background_color: None});
+                    }
+                    println!("char_idx: {}", char_idx);
+                    char_idx += 1;
+                }
+                new_frame.push(new_line);
             }
-            file_out.push(frame)
+            file_out.push(new_frame)
         }
         i += 1;
         file_loc = name.clone() + &i.to_string();
@@ -27,7 +64,7 @@ pub fn load_file(name: String) -> Vec<Vec<String>> {
     if empty{
         panic!("empty file {}", &name);
     }
-
+    
     let num_lines: usize = file_out[0].len();
     let num_chars: usize = file_out[0][0].len();
     for frame in &file_out {
@@ -36,7 +73,7 @@ pub fn load_file(name: String) -> Vec<Vec<String>> {
         }
         for line in frame {
             if num_chars != line.len() {
-                panic!("mismatch num_chars in {}", &name);
+                panic!("mismatch num_chars in {}: {} {}", &name, num_chars, line.len());
             }
         }
     }

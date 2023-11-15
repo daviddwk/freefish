@@ -4,7 +4,7 @@ use crossterm::{
     ExecutableCommand,
     cursor::{Hide, MoveTo},
     terminal::Clear,
-    style::{Color, Colors, Print, SetColors, SetForegroundColor, SetBackgroundColor}
+    style::{Color, SetForegroundColor, SetBackgroundColor}
 };
 
 use std::env;
@@ -76,11 +76,11 @@ fn main() {
         fishies.push(Fish::new(arg, (1, 1), tank.get_size()));
     }
     
-    io::stdout().execute(Hide);
-    io::stdout().execute(Clear(crossterm::terminal::ClearType::All));
+    if let Err(e) = io::stdout().execute(Hide) { panic!("{}", e); }
+    if let Err(e) = io::stdout().execute(Clear(crossterm::terminal::ClearType::All)) { panic!("{}", e); }
     loop {
-        io::stdout().execute(MoveTo(0, 0));
-        io::stdout().execute(Clear(crossterm::terminal::ClearType::FromCursorDown));
+        if let Err(e) = io::stdout().execute(MoveTo(0, 0)) { panic!("{}", e); }
+        if let Err(e) = io::stdout().execute(Clear(crossterm::terminal::ClearType::FromCursorDown)) { panic!("{}", e); }
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
                 let mut printed = false;
@@ -92,13 +92,10 @@ fn main() {
                     }
                 }
                 if !printed {
-                    print!("{}", tank.anim[tank.frame][row_idx].chars().nth(glyph_idx).unwrap());
-                    io::stdout().execute(SetForegroundColor(Color::Green));
+                    tank.anim[tank.frame][row_idx][glyph_idx].print();
                 }
             }
-            if row_idx != tank.size.0 - 1 {
-                print!("\n");
-            }
+            print!("\n");
         }
         for fish_idx in 0..fishies.len() {
             fishies[fish_idx].update();

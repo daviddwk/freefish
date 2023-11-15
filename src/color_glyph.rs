@@ -14,6 +14,8 @@ pub struct ColorGlyph {
 
 impl ColorGlyph {
     pub fn print(&self) {
+        io::stdout().execute(SetForegroundColor(Color::Reset));
+        io::stdout().execute(SetBackgroundColor(Color::Reset));
         if let Some(fg) = self.foreground_color  {
             io::stdout().execute(SetForegroundColor(fg));
         }
