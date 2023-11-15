@@ -1,7 +1,18 @@
 extern crate rand;
 use self::rand::Rng;
 
+
+
+extern crate crossterm;
+use crossterm::{
+    ExecutableCommand,
+    cursor::{Hide, MoveTo},
+    terminal::Clear,
+    style::{Color, Colors, Print, SetColors, SetForegroundColor, SetBackgroundColor}
+};
+
 use load_file::*;
+use color_glyph::*;
 
 pub struct Fish {
     pos: (usize, usize),
@@ -60,16 +71,32 @@ impl Fish {
         }
     }
 
-    pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<char> {
+    pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<ColorGlyph> {
+
+        static foreground_color: Option<Color> = None;
+
         if row_idx >= self.size.0 + self.pos.0 || row_idx < self.pos.0 ||
            glyph_idx >= self.size.1 + self.pos.1 || glyph_idx < self.pos.1
         {
             return None;
         }
+
+        let glyph_char: char;
         if self.flip {
-            return Some(self.flip_anim[self.frame][row_idx - self.pos.0].chars().nth(glyph_idx - self.pos.1).unwrap());
+            glyph_char = self.flip_anim[self.frame][row_idx - self.pos.0].chars().nth(glyph_idx - self.pos.1).unwrap();
+        } else {
+            glyph_char = self.fish_anim[self.frame][row_idx - self.pos.0].chars().nth(glyph_idx - self.pos.1).unwrap();
         }
-        return Some(self.fish_anim[self.frame][row_idx - self.pos.0].chars().nth(glyph_idx - self.pos.1).unwrap());
+
+        if glyph_char == ' '  {
+            return None;
+        }
+
+        return Some(ColorGlyph{
+            glyph: glyph_char,
+            foreground_color: Some(Color::Green),
+            background_color: None,
+        });
     }
 }
 

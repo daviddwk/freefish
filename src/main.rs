@@ -3,7 +3,8 @@ extern crate crossterm;
 use crossterm::{
     ExecutableCommand,
     cursor::{Hide, MoveTo},
-    terminal::{Clear, ScrollDown}
+    terminal::Clear,
+    style::{Color, Colors, Print, SetColors, SetForegroundColor, SetBackgroundColor}
 };
 
 use std::env;
@@ -13,6 +14,7 @@ use std::time;
 mod fish;
 mod tank;
 mod load_file;
+mod color_glyph;
 
 use fish::*;
 use tank::*;
@@ -78,18 +80,20 @@ fn main() {
     io::stdout().execute(Clear(crossterm::terminal::ClearType::All));
     loop {
         io::stdout().execute(MoveTo(0, 0));
+        io::stdout().execute(Clear(crossterm::terminal::ClearType::FromCursorDown));
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
                 let mut printed = false;
                 for fish_idx in 0..fishies.len() {
                     if let Some(glyph) = fishies[fish_idx].get_glyph(row_idx, glyph_idx) {
-                        print!{"{}", glyph};
+                        glyph.print();
                         printed = true;
                         break;
                     }
                 }
                 if !printed {
                     print!("{}", tank.anim[tank.frame][row_idx].chars().nth(glyph_idx).unwrap());
+                    io::stdout().execute(SetForegroundColor(Color::Green));
                 }
             }
             if row_idx != tank.size.0 - 1 {
