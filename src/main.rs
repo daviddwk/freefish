@@ -1,3 +1,11 @@
+use std::io::{self, Write};
+extern crate crossterm;
+use crossterm::{
+    ExecutableCommand,
+    cursor::{Hide, MoveTo},
+    terminal::{Clear, ScrollDown}
+};
+
 use std::env;
 use std::thread;
 use std::time;
@@ -66,8 +74,10 @@ fn main() {
         fishies.push(Fish::new(arg, (1, 1), tank.get_size()));
     }
     
+    io::stdout().execute(Hide);
+    io::stdout().execute(Clear(crossterm::terminal::ClearType::All));
     loop {
-        print!("\x1B[2J\x1B[1;1H");
+        io::stdout().execute(MoveTo(0, 0));
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
                 let mut printed = false;
@@ -82,7 +92,9 @@ fn main() {
                     print!("{}", tank.anim[tank.frame][row_idx].chars().nth(glyph_idx).unwrap());
                 }
             }
-            print!("\n");
+            if row_idx != tank.size.0 - 1 {
+                print!("\n");
+            }
         }
         for fish_idx in 0..fishies.len() {
             fishies[fish_idx].update();

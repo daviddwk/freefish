@@ -8,7 +8,6 @@ pub fn load_file(name: String) -> Vec<Vec<String>> {
     let mut file_loc = name.clone() + &i.to_string();
     let mut file_path = Path::new(&file_loc);
     let mut empty: bool = true;
-    println!("{}", file_path.display());
     while file_path.exists() { 
         if let Ok(lines) = read_lines(file_path) {
             let mut frame = Vec::new();

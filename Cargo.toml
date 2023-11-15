@@ -5,3 +5,4 @@ include = ["*.rs"]
 
 [dependencies]
 rand = "0.8.5"
+crossterm = "0.27.0"
