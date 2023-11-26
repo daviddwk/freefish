@@ -1,5 +1,6 @@
 use std::io::{self, Write};
 extern crate crossterm;
+extern crate rand;
 use crossterm::{
     ExecutableCommand,
     cursor::{Hide, MoveTo},
