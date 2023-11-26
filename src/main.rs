@@ -6,6 +6,7 @@ use crossterm::{
     terminal::Clear,
     style::{Color, SetForegroundColor, SetBackgroundColor}
 };
+extern crate home;
 
 use std::env;
 use std::thread;
@@ -70,7 +71,7 @@ fn main() {
         std::process::exit(0);
     }
 
-    let tank: Tank = Tank::new(tank_arg);
+    let mut tank: Tank = Tank::new(tank_arg);
     let mut fishies: Vec<Fish> = Vec::new();
     for arg in fish_args {
         fishies.push(Fish::new(arg, (1, 1), tank.get_size()));
@@ -93,6 +94,7 @@ fn main() {
                 }
                 if !printed {
                     tank.anim[tank.frame][row_idx][glyph_idx].print();
+
                 }
             }
             print!("\n");
@@ -100,6 +102,7 @@ fn main() {
         for fish_idx in 0..fishies.len() {
             fishies[fish_idx].update();
         }
+        tank.update();
         thread::sleep(time::Duration::from_millis(200));
     }
 }

@@ -17,6 +17,7 @@ pub fn load_file(name: String) -> Vec<Vec<Vec<ColorGlyph>>> {
     let mut empty: bool = true;
     println!("{}", file_path.display());
     while file_path.exists() {
+        println!("file is there yes");
         let mut curr_fg_color: Option<Color> = None;
         if let Ok(lines) = read_lines(file_path) {
             let mut new_frame: Vec<Vec<ColorGlyph>> = Vec::new();
@@ -43,13 +44,11 @@ pub fn load_file(name: String) -> Vec<Vec<Vec<ColorGlyph>>> {
                         }
                     } else {
                         empty = false;
-                        println!("push");
                         new_line.push(ColorGlyph{
                                 glyph: chars.chars().nth(char_idx).unwrap(),
                                 foreground_color: curr_fg_color,
                                 background_color: None});
                     }
-                    println!("char_idx: {}", char_idx);
                     char_idx += 1;
                 }
                 new_frame.push(new_line);

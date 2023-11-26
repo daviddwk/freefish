@@ -1,6 +1,6 @@
 extern crate rand;
 use self::rand::Rng;
-
+use home::*;
 
 
 extern crate crossterm;
@@ -27,8 +27,8 @@ pub struct Fish {
 
 impl Fish {
     pub fn new(name: String, position: (usize, usize), tnk_size: (usize, usize)) -> Self {
-        let fish_frames = load_file(name.clone() + ".fish");
-        let flip_frames = load_file(name.clone() + ".flip");
+        let fish_frames = load_file(home_dir().unwrap().to_str().unwrap().to_owned() + "/.config/freefish/fish/" + &name.clone() + "/fish");
+        let flip_frames = load_file(home_dir().unwrap().to_str().unwrap().to_owned() + "/.config/freefish/fish/" + &name.clone() + "/flip");
         if fish_frames.len() != flip_frames.len() ||
            fish_frames[0].len() != flip_frames[0].len() ||
            fish_frames[0][0].len() != flip_frames[0][0].len()
@@ -38,13 +38,14 @@ impl Fish {
         if fish_frames.len() != flip_frames.len(){
             panic!("{} mismatch fish and flip number of frames", name);
         }
+        let mut rng = rand::thread_rng();
         return Self {
             pos: position, // rand input
             dest: position,
             size: (fish_frames[0].len(), fish_frames[0][0].len()), // load
             tank_size: tnk_size,
-            flip: false,
-            frame: 0, // rand
+            flip: rng.gen::<bool>(),
+            frame: rng.gen_range(0..fish_frames.len()), // rand
             fish_anim: fish_frames, //load
             flip_anim: flip_frames, //load
         }
@@ -61,8 +62,10 @@ impl Fish {
         }
         if self.pos.1 < self.dest.1 {
             self.pos.1 += 1;
+            self.flip = false;
         } else if self.pos.1 > self.dest.1 {
             self.pos.1 -= 1;
+            self.flip = true;
         }
         if self.pos == self.dest {
             let mut rng = rand::thread_rng();
