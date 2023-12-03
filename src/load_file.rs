@@ -84,7 +84,7 @@ pub fn load_file(name: String) -> Vec<Vec<Vec<ColorGlyph>>> {
 
 pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Vec<Vec<Vec<ColorGlyph>>> {
     
-    // check size
+    // TODO check size
     let mut out_animation: Vec<Vec<Vec<ColorGlyph>>> = Vec::new();
     for frame_idx in 0..animation_symbols.as_array().unwrap().len() {
         let mut out_frame: Vec<Vec<ColorGlyph>> = Vec::new();
@@ -93,9 +93,24 @@ pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Ve
             let line = animation_symbols[frame_idx][line_idx].as_str().unwrap();
             for symbol_idx in 0..line.len() {
                 // color switch statement
+                let mut fg_color: Option<Color> = None;
+                match animation_colors
+                    .as_array().unwrap()[frame_idx]
+                    .as_array().unwrap()[line_idx]
+                    .as_str().unwrap().chars().nth(symbol_idx).unwrap()
+                {
+                    'r'=>fg_color = Some(Color::Red),
+                    'g'=>fg_color = Some(Color::Green),
+                    'y'=>fg_color = Some(Color::Yellow),
+                    'b'=>fg_color = Some(Color::Blue),
+                    'm'=>fg_color = Some(Color::Magenta),
+                    'c'=>fg_color = Some(Color::Cyan),
+                    'w'=>fg_color = Some(Color::White),
+                     _ =>fg_color = None
+                }
                 out_line.push(ColorGlyph{
                     glyph: line.chars().nth(symbol_idx).unwrap(),
-                    foreground_color: None,
+                    foreground_color: fg_color,
                     background_color: None
                 });
             }

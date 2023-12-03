@@ -43,13 +43,10 @@ impl Fish {
             .expect("file should have flipped_animation/symbols key");
         let flip_colors = json.pointer("/flipped_animation/colors")
             .expect("file should have flipped_animation/colors key");
-
         
         let fish_frames = load_animation(anim_symbols, anim_colors);
-        //let fish_frames = load_file(home_dir().unwrap().to_str().unwrap().to_owned() + 
-        //                            "/.config/freefish/fish/" + &name.clone() + "/fish");
-        let flip_frames = load_file(home_dir().unwrap().to_str().unwrap().to_owned() + 
-                                    "/.config/freefish/fish/" + &name.clone() + "/flip");
+        let flip_frames = load_animation(flip_symbols, flip_colors);
+
         if fish_frames.len() != flip_frames.len() ||
            fish_frames[0].len() != flip_frames[0].len() ||
            fish_frames[0][0].len() != flip_frames[0][0].len()
