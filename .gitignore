@@ -1,0 +1,8 @@
+/target/
+Cargo.lock
+main
+*.fish*
+*.tank*
+*.flip*
+*.out
+freefish
