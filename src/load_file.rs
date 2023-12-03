@@ -83,7 +83,6 @@ pub fn load_file(name: String) -> Vec<Vec<Vec<ColorGlyph>>> {
 }
 
 pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Vec<Vec<Vec<ColorGlyph>>> {
-    
     // TODO check size
     let mut out_animation: Vec<Vec<Vec<ColorGlyph>>> = Vec::new();
     for frame_idx in 0..animation_symbols.as_array().unwrap().len() {
@@ -92,26 +91,20 @@ pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Ve
             let mut out_line: Vec<ColorGlyph> = Vec::new();
             let line = animation_symbols[frame_idx][line_idx].as_str().unwrap();
             for symbol_idx in 0..line.len() {
-                // color switch statement
-                let mut fg_color: Option<Color> = None;
-                match animation_colors
-                    .as_array().unwrap()[frame_idx]
-                    .as_array().unwrap()[line_idx]
-                    .as_str().unwrap().chars().nth(symbol_idx).unwrap()
-                {
-                    'r'=>fg_color = Some(Color::Red),
-                    'g'=>fg_color = Some(Color::Green),
-                    'y'=>fg_color = Some(Color::Yellow),
-                    'b'=>fg_color = Some(Color::Blue),
-                    'm'=>fg_color = Some(Color::Magenta),
-                    'c'=>fg_color = Some(Color::Cyan),
-                    'w'=>fg_color = Some(Color::White),
-                     _ =>fg_color = None
-                }
                 out_line.push(ColorGlyph{
                     glyph: line.chars().nth(symbol_idx).unwrap(),
-                    foreground_color: fg_color,
-                    background_color: None
+                    foreground_color: match_color( 
+                        animation_colors.get("foreground").unwrap()
+                        .as_array().unwrap()[frame_idx]
+                        .as_array().unwrap()[line_idx]
+                        .as_str().unwrap().chars().nth(symbol_idx).unwrap()
+                    ),
+                    background_color: match_color( 
+                        animation_colors.get("background").unwrap()
+                        .as_array().unwrap()[frame_idx]
+                        .as_array().unwrap()[line_idx]
+                        .as_str().unwrap().chars().nth(symbol_idx).unwrap()
+                    )
                 });
             }
             out_frame.push(out_line);
@@ -119,6 +112,20 @@ pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Ve
         out_animation.push(out_frame);
     }
     return out_animation;
+}
+
+fn match_color(color: char) -> Option<Color> {
+    match color {
+        'r'=> return Some(Color::Red),
+        'g'=> return Some(Color::Green),
+        'y'=> return Some(Color::Yellow),
+        'b'=> return Some(Color::Blue),
+        'm'=> return Some(Color::Magenta),
+        'c'=> return Some(Color::Cyan),
+        'w'=> return Some(Color::White),
+         _ => return None
+    }
+    return None;
 }
 
 fn read_lines<P>(file_name: P) -> io::Result<io::Lines<io::BufReader<File>>>

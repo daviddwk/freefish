@@ -20,7 +20,7 @@ impl ColorGlyph {
             io::stdout().execute(SetForegroundColor(fg));
         }
         if let Some(bg) = self.background_color {
-            io::stdout().execute(SetForegroundColor(bg));
+            io::stdout().execute(SetBackgroundColor(bg));
         }
         print!("{}", self.glyph);
     }

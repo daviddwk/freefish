@@ -4,19 +4,31 @@
             ["><v>"],
             ["><^>"]
         ],
-        "colors": [
-            ["mmmm"],
-            ["rrrr"]
-        ]
+        "colors": {
+            "foreground": [
+                ["mmmm"],
+                ["rrrr"]
+            ],
+            "background": [
+                ["rrrr"],
+                ["mmmm"]
+            ]
+        }
     },
     "flipped_animation": {
         "symbols": [
             ["<v><"],
             ["<^><"]
         ],
-        "colors": [
-            ["mmmm"],
-            ["rrrr"]
-        ]
+        "colors": {
+            "foreground": [
+                ["mmmm"],
+                ["rrrr"]
+            ],
+            "background": [
+                ["rrrr"],
+                ["mmmm"]
+            ]
+        }
     }
 }
