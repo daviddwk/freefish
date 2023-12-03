@@ -1,11 +1,10 @@
-use std::io::{self, Write};
+use std::io::{self};
 extern crate crossterm;
 extern crate rand;
 use crossterm::{
     ExecutableCommand,
     cursor::{Hide, MoveTo},
     terminal::Clear,
-    style::{Color, SetForegroundColor, SetBackgroundColor}
 };
 extern crate home;
 
@@ -86,16 +85,21 @@ fn main() {
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
                 let mut printed = false;
-                for fish_idx in 0..fishies.len() {
-                    if let Some(glyph) = fishies[fish_idx].get_glyph(row_idx, glyph_idx) {
-                        glyph.print();
-                        printed = true;
-                        break;
+                if tank.fg_anim[tank.frame][row_idx][glyph_idx].glyph != ' ' {
+                    tank.fg_anim[tank.frame][row_idx][glyph_idx].print(); 
+                    printed = true;
+                }
+                if !printed {
+                    for fish_idx in 0..fishies.len() {
+                        if let Some(glyph) = fishies[fish_idx].get_glyph(row_idx, glyph_idx) {
+                            glyph.print();
+                            printed = true;
+                            break;
+                        }
                     }
                 }
                 if !printed {
-                    tank.anim[tank.frame][row_idx][glyph_idx].print();
-
+                    tank.bg_anim[tank.frame][row_idx][glyph_idx].print();
                 }
             }
             print!("\n");

@@ -2,12 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use color_glyph::*;
-use crossterm::{
-    ExecutableCommand,
-    cursor::{Hide, MoveTo},
-    terminal::Clear,
-    style::{Color, SetForegroundColor, SetBackgroundColor}
-};
+use crossterm::style::Color;
 extern crate serde_json;
 use self::serde_json::*;
 
@@ -125,7 +120,6 @@ fn match_color(color: char) -> Option<Color> {
         'w'=> return Some(Color::White),
          _ => return None
     }
-    return None;
 }
 
 fn read_lines<P>(file_name: P) -> io::Result<io::Lines<io::BufReader<File>>>

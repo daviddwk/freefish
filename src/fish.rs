@@ -3,17 +3,7 @@ use self::rand::Rng;
 use std::fs::File;
 extern crate serde_json;
 use self::serde_json::*;
-use home::*;
 use load_file::*;
-
-
-extern crate crossterm;
-use crossterm::{
-    ExecutableCommand,
-    cursor::{Hide, MoveTo},
-    terminal::Clear,
-    style::{Color, Colors, Print, SetColors, SetForegroundColor, SetBackgroundColor}
-};
 
 use load_file::*;
 use color_glyph::*;
@@ -31,9 +21,9 @@ pub struct Fish {
 
 impl Fish {
     pub fn new(name: String, position: (usize, usize), tnk_size: (usize, usize)) -> Self {
-        let file = File::open(name.clone() + ".json")
+        let fish_file = File::open(name.clone() + ".json")
             .expect("file should open");
-        let json: serde_json::Value = serde_json::from_reader(file)
+        let json: serde_json::Value = serde_json::from_reader(fish_file)
             .expect("file should be JSON");
         let anim_symbols = json.pointer("/animation/symbols")
             .expect("file should have animation/symbols key");
