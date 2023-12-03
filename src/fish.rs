@@ -1,6 +1,10 @@
 extern crate rand;
 use self::rand::Rng;
+use std::fs::File;
+extern crate serde_json;
+use self::serde_json::*;
 use home::*;
+use load_file::*;
 
 
 extern crate crossterm;
@@ -27,8 +31,25 @@ pub struct Fish {
 
 impl Fish {
     pub fn new(name: String, position: (usize, usize), tnk_size: (usize, usize)) -> Self {
-        let fish_frames = load_file(home_dir().unwrap().to_str().unwrap().to_owned() + "/.config/freefish/fish/" + &name.clone() + "/fish");
-        let flip_frames = load_file(home_dir().unwrap().to_str().unwrap().to_owned() + "/.config/freefish/fish/" + &name.clone() + "/flip");
+        let file = File::open(name.clone() + ".json")
+            .expect("file should open");
+        let json: serde_json::Value = serde_json::from_reader(file)
+            .expect("file should be JSON");
+        let anim_symbols = json.pointer("/animation/symbols")
+            .expect("file should have animation/symbols key");
+        let anim_colors = json.pointer("/animation/colors")
+            .expect("file should have animation/colors key");
+        let flip_symbols = json.pointer("/flipped_animation/symbols")
+            .expect("file should have flipped_animation/symbols key");
+        let flip_colors = json.pointer("/flipped_animation/colors")
+            .expect("file should have flipped_animation/colors key");
+
+        
+        let fish_frames = load_animation(anim_symbols, anim_colors);
+        //let fish_frames = load_file(home_dir().unwrap().to_str().unwrap().to_owned() + 
+        //                            "/.config/freefish/fish/" + &name.clone() + "/fish");
+        let flip_frames = load_file(home_dir().unwrap().to_str().unwrap().to_owned() + 
+                                    "/.config/freefish/fish/" + &name.clone() + "/flip");
         if fish_frames.len() != flip_frames.len() ||
            fish_frames[0].len() != flip_frames[0].len() ||
            fish_frames[0][0].len() != flip_frames[0][0].len()
