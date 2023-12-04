@@ -30,9 +30,8 @@ impl Tank {
         let background_colors = tank_json.pointer("/background/colors")
             .expect("file should have background/colors key");
         let mut depth: usize = 0;
-        if (tank_json["depth"].is_u64()) {
+        if tank_json["depth"].is_u64() {
             depth = usize::try_from(tank_json["depth"].as_u64().unwrap()).unwrap();
-            println!("{}", depth);
         }
 
         let foreground_animation = load_animation(foreground_symbols, foreground_colors);
