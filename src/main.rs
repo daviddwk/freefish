@@ -85,8 +85,8 @@ fn main() {
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
                 let mut printed = false;
-                if tank.fg_anim[tank.frame][row_idx][glyph_idx].glyph != ' ' {
-                    tank.fg_anim[tank.frame][row_idx][glyph_idx].print(); 
+                if tank.fg_anim[tank.fg_frame][row_idx][glyph_idx].glyph != ' ' {
+                    tank.fg_anim[tank.fg_frame][row_idx][glyph_idx].print(); 
                     printed = true;
                 }
                 if !printed {
@@ -99,7 +99,7 @@ fn main() {
                     }
                 }
                 if !printed {
-                    tank.bg_anim[tank.frame][row_idx][glyph_idx].print();
+                    tank.bg_anim[tank.bg_frame][row_idx][glyph_idx].print();
                 }
             }
             print!("\n");

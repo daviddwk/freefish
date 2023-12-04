@@ -7,7 +7,8 @@ use self::serde_json::*;
 use rand::Rng;
 pub struct Tank {
     pub size: (usize, usize),
-    pub frame: usize,
+    pub fg_frame: usize,
+    pub bg_frame: usize,
     pub fg_anim: Vec<Vec<Vec<ColorGlyph>>>,
     pub bg_anim: Vec<Vec<Vec<ColorGlyph>>>
 }
@@ -30,14 +31,11 @@ impl Tank {
         let foreground_animation = load_animation(foreground_symbols, foreground_colors);
         let background_animation = load_animation(background_symbols,background_colors);
     
-        let tank_frames = load_file(
-            home_dir().unwrap().to_str().unwrap().to_owned() + 
-            "/.config/freefish/tank/" + &name.clone() + "/tank"
-        );
         let mut rng = rand::thread_rng();
         return Self {
-            size: (tank_frames[0].len(), tank_frames[0][0].len()),
-            frame: rng.gen_range(0..tank_frames.len()),
+            size: (foreground_animation[0].len(), foreground_animation[0][0].len()),
+            fg_frame: rng.gen_range(0..foreground_animation.len()),
+            bg_frame: rng.gen_range(0..background_animation.len()),
             fg_anim: foreground_animation, 
             bg_anim: background_animation
         }
@@ -46,9 +44,12 @@ impl Tank {
         return self.size;
     }
     pub fn update(&mut self) {
-        self.frame += 1;
-        if self.frame >= self.bg_anim.len() {
-            self.frame = 0;
+        self.fg_frame += 1;
+        if self.fg_frame >= self.bg_anim.len() {
+            self.fg_frame = 0;
+        }
+        if self.bg_frame >= self.bg_anim.len() {
+            self.bg_frame = 0;
         }
     }
 }
