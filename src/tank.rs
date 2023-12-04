@@ -45,11 +45,8 @@ impl Tank {
     }
     pub fn update(&mut self) {
         self.fg_frame += 1;
-        if self.fg_frame >= self.bg_anim.len() {
-            self.fg_frame = 0;
-        }
-        if self.bg_frame >= self.bg_anim.len() {
-            self.bg_frame = 0;
-        }
+        self.bg_frame += 1;
+        if self.fg_frame >= self.fg_anim.len() { self.fg_frame = 0; }
+        if self.bg_frame >= self.bg_anim.len() { self.bg_frame = 0; }
     }
 }
