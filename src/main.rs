@@ -74,7 +74,7 @@ fn main() {
     let mut tank: Tank = Tank::new(tank_arg);
     let mut fishies: Vec<Fish> = Vec::new();
     for arg in fish_args {
-        fishies.push(Fish::new(arg, (1, 1), tank.get_size()));
+        fishies.push(Fish::new(arg, &tank));
     }
     
     if let Err(e) = io::stdout().execute(Hide) { panic!("{}", e); }

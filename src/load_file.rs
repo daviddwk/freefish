@@ -15,7 +15,6 @@ pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Ve
             let mut out_line: Vec<ColorGlyph> = Vec::new();
             let line = animation_symbols[frame_idx][line_idx].as_str().unwrap();
             for symbol_idx in 0..line.len() {
-                println!("frame_idx{}line_idx{}symbol_idx{}", frame_idx, line_idx, symbol_idx);
                 out_line.push(ColorGlyph{
                     glyph: line.chars().nth(symbol_idx).unwrap(),
                     foreground_color: match_color( 
@@ -41,6 +40,7 @@ pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Ve
 
 fn match_color(color: char) -> Option<Color> {
     match color {
+        'a'=> return Some(Color::DarkGrey),
         'r'=> return Some(Color::Red),
         'g'=> return Some(Color::Green),
         'y'=> return Some(Color::Yellow),
@@ -48,6 +48,16 @@ fn match_color(color: char) -> Option<Color> {
         'm'=> return Some(Color::Magenta),
         'c'=> return Some(Color::Cyan),
         'w'=> return Some(Color::White),
+
+        'A'=> return Some(Color::Black),
+        'R'=> return Some(Color::DarkRed),
+        'G'=> return Some(Color::DarkGreen),
+        'Y'=> return Some(Color::DarkYellow),
+        'B'=> return Some(Color::DarkBlue),
+        'M'=> return Some(Color::DarkMagenta),
+        'C'=> return Some(Color::DarkCyan),
+        'W'=> return Some(Color::Grey),
+
          _ => return None
     }
 }

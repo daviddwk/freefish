@@ -4,7 +4,7 @@ use std::fs::File;
 extern crate serde_json;
 use self::serde_json::*;
 use load_file::*;
-
+use tank::*;
 use load_file::*;
 use color_glyph::*;
 
@@ -12,6 +12,7 @@ pub struct Fish {
     pos: (usize, usize),
     dest: (usize, usize),
     size: (usize, usize),
+    tank_depth: usize,
     tank_size: (usize, usize),
     flip: bool,
     frame: usize,
@@ -20,7 +21,7 @@ pub struct Fish {
 }
 
 impl Fish {
-    pub fn new(name: String, position: (usize, usize), tnk_size: (usize, usize)) -> Self {
+    pub fn new(name: String, tank: &Tank) -> Self {
         let fish_file = File::open(name.clone() + ".json")
             .expect("file should open");
         let json: serde_json::Value = serde_json::from_reader(fish_file)
@@ -48,14 +49,15 @@ impl Fish {
         }
         let mut rng = rand::thread_rng();
         return Self {
-            pos: position, // rand input
-            dest: position,
-            size: (fish_frames[0].len(), fish_frames[0][0].len()), // load
-            tank_size: tnk_size,
-            flip: rng.gen::<bool>(),
-            frame: rng.gen_range(0..fish_frames.len()), // rand
-            fish_anim: fish_frames, //load
-            flip_anim: flip_frames, //load
+            pos:        (rng.gen_range(tank.depth..tank.size.0), rng.gen_range(0..tank.size.1)),
+            dest:       (rng.gen_range(tank.depth..tank.size.0), rng.gen_range(0..tank.size.1)),
+            size:       (fish_frames[0].len(), fish_frames[0][0].len()),
+            tank_size:  tank.size,
+            tank_depth: tank.depth,
+            flip:       rng.gen::<bool>(),
+            frame:      rng.gen_range(0..fish_frames.len()),
+            fish_anim:  fish_frames,
+            flip_anim:  flip_frames,
         }
     }
     pub fn update(&mut self) {
@@ -77,8 +79,10 @@ impl Fish {
         }
         if self.pos == self.dest {
             let mut rng = rand::thread_rng();
-            self.dest = (rng.gen_range(0..(self.tank_size.0 - self.size.0)), 
-                         rng.gen_range(0..(self.tank_size.1 - self.size.1)));
+            self.dest = (
+                rng.gen_range(self.tank_depth..self.tank_size.0), 
+                rng.gen_range(0..self.tank_size.1)
+            );
         }
     }
 

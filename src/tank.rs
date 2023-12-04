@@ -5,8 +5,10 @@ use std::fs::File;
 extern crate serde_json;
 use self::serde_json::*;
 use rand::Rng;
+use std::convert::TryFrom;
 pub struct Tank {
     pub size: (usize, usize),
+    pub depth: usize,
     pub fg_frame: usize,
     pub bg_frame: usize,
     pub fg_anim: Vec<Vec<Vec<ColorGlyph>>>,
@@ -27,21 +29,24 @@ impl Tank {
             .expect("file should have background/symbols key");
         let background_colors = tank_json.pointer("/background/colors")
             .expect("file should have background/colors key");
-        
+        let mut depth: usize = 0;
+        if (tank_json["depth"].is_u64()) {
+            depth = usize::try_from(tank_json["depth"].as_u64().unwrap()).unwrap();
+            println!("{}", depth);
+        }
+
         let foreground_animation = load_animation(foreground_symbols, foreground_colors);
         let background_animation = load_animation(background_symbols,background_colors);
     
         let mut rng = rand::thread_rng();
         return Self {
-            size: (foreground_animation[0].len(), foreground_animation[0][0].len()),
+            size:     (foreground_animation[0].len(), foreground_animation[0][0].len()),
+            depth:    depth,
             fg_frame: rng.gen_range(0..foreground_animation.len()),
             bg_frame: rng.gen_range(0..background_animation.len()),
-            fg_anim: foreground_animation, 
-            bg_anim: background_animation
+            fg_anim:  foreground_animation, 
+            bg_anim:  background_animation
         }
-    }
-    pub fn get_size(&self) -> (usize, usize) {
-        return self.size;
     }
     pub fn update(&mut self) {
         self.fg_frame += 1;
