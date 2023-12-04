@@ -15,6 +15,7 @@ pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Ve
             let mut out_line: Vec<ColorGlyph> = Vec::new();
             let line = animation_symbols[frame_idx][line_idx].as_str().unwrap();
             for symbol_idx in 0..line.len() {
+                println!("frame_idx {} line_idx {} symbol_idx {}", frame_idx, line_idx, symbol_idx);
                 out_line.push(ColorGlyph{
                     glyph: line.chars().nth(symbol_idx).unwrap(),
                     foreground_color: match_color( 

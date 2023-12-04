@@ -7,11 +7,11 @@
         "colors": {
             "foreground": [
                 ["mmmm"],
-                ["rrrr"]
+                ["mmrm"]
             ],
             "background": [
-                ["rrrr"],
-                ["mmmm"]
+                ["    "],
+                ["    "]
             ]
         }
     },
@@ -23,11 +23,11 @@
         "colors": {
             "foreground": [
                 ["mmmm"],
-                ["rrrr"]
+                ["mrmm"]
             ],
             "background": [
-                ["rrrr"],
-                ["mmmm"]
+                ["    "],
+                ["    "]
             ]
         }
     }

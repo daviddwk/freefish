@@ -58,18 +58,16 @@ fn main() {
         } else if arg.eq("-f") {
             let mut tmp_args_iter = args_iter.clone();
             while let Some(arg) = tmp_args_iter.next() {
-                if arg.chars().next() != Some('-') {
-                    args_iter.next();
-                    fish_args.push(arg.clone()); 
-                }
+                if arg.chars().next() == Some('-') { break; }
+                args_iter.next();
+                fish_args.push(arg.clone()); 
             }
         } else if arg.eq("-d") {
             let mut tmp_args_iter = args_iter.clone();
             while let Some(arg) = tmp_args_iter.next() {
-                if arg.chars().next() != Some('-') {
-                    args_iter.next();
-                    duck_args.push(arg.clone()); 
-                }
+                if arg.chars().next() == Some('-') { break; }
+                args_iter.next();
+                duck_args.push(arg.clone()); 
             }
         } else {
             println!("invalid argument {}", arg);
@@ -96,7 +94,6 @@ fn main() {
     if let Err(e) = io::stdout().execute(Clear(crossterm::terminal::ClearType::All)) { panic!("{}", e); }
     loop {
         if let Err(e) = io::stdout().execute(MoveTo(0, 0)) { panic!("{}", e); }
-        if let Err(e) = io::stdout().execute(Clear(crossterm::terminal::ClearType::FromCursorDown)) { panic!("{}", e); }
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
                 let mut printed = false;
