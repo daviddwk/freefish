@@ -7,15 +7,39 @@ extern crate serde_json;
 use self::serde_json::*;
 
 pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Vec<Vec<Vec<ColorGlyph>>> {
-    // TODO check size
     let mut out_animation: Vec<Vec<Vec<ColorGlyph>>> = Vec::new();
-    for frame_idx in 0..animation_symbols.as_array().unwrap().len() {
+    
+    if !animation_symbols.is_array() { 
+        println!("symbols is not array");
+    }
+    let num_frames = animation_symbols.as_array().unwrap().len();
+    if !animation_symbols[0].is_array() { 
+        println!("symbols[0] is not array"); 
+    }
+    let num_lines = animation_symbols[0].as_array().unwrap().len();
+    if !animation_symbols[0][0].is_string() { 
+        println!("symbols[0][0] is not a string"); 
+    }
+    let num_symbols = animation_symbols[0][0].as_str().unwrap().len();
+
+    for frame_idx in 0..num_frames {
         let mut out_frame: Vec<Vec<ColorGlyph>> = Vec::new();
-        for line_idx in 0..animation_symbols[frame_idx].as_array().unwrap().len() {
+        if !animation_symbols[frame_idx].is_array() { 
+            println!("symbols[{}] is not an array", frame_idx); 
+        }
+        if animation_symbols[frame_idx].as_array().unwrap().len() != num_lines {
+            println!("symbols[{}] differs in length from symbols[0]", frame_idx);
+        }
+        for line_idx in 0..num_lines {
             let mut out_line: Vec<ColorGlyph> = Vec::new();
+            if !animation_symbols[frame_idx][line_idx].is_string() { 
+                println!("symbols[{}][{}] is not a string", frame_idx, line_idx); 
+            }
             let line = animation_symbols[frame_idx][line_idx].as_str().unwrap();
-            for symbol_idx in 0..line.len() {
-                println!("frame_idx {} line_idx {} symbol_idx {}", frame_idx, line_idx, symbol_idx);
+            if line.len() != num_symbols {
+                println!("symbols[{}][{}] differs in length from symbols[0][0]", frame_idx, line_idx);
+            } 
+            for symbol_idx in 0..num_symbols {
                 out_line.push(ColorGlyph{
                     glyph: line.chars().nth(symbol_idx).unwrap(),
                     foreground_color: match_color( 
