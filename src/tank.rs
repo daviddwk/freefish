@@ -18,6 +18,7 @@ impl Tank {
     pub fn new(name: String) -> Self {
         let tank_file = File::open(name.clone() + ".json")
             .expect("tank file should open");
+        println!("{}", name);
         let tank_json: serde_json::Value = 
             serde_json::from_reader(tank_file)
             .expect("file should be JSON");
@@ -25,17 +26,22 @@ impl Tank {
             .expect("file should have foreground/symbols key");
         let foreground_colors = tank_json.pointer("/foreground/colors")
             .expect("file should have foreground/colors key");
+        let foreground_highlights = tank_json.pointer("/foreground/highlights")
+            .expect("file should have foreground/highlights key");
         let background_symbols = tank_json.pointer("/background/symbols")
             .expect("file should have background/symbols key");
         let background_colors = tank_json.pointer("/background/colors")
             .expect("file should have background/colors key");
+        let background_highlights = tank_json.pointer("/background/highlights")
+            .expect("file should have background/highlights key");
+
         let mut depth: usize = 0;
         if tank_json["depth"].is_u64() {
             depth = usize::try_from(tank_json["depth"].as_u64().unwrap()).unwrap();
         }
 
-        let foreground_animation = load_animation(foreground_symbols, foreground_colors);
-        let background_animation = load_animation(background_symbols,background_colors);
+        let foreground_animation = load_animation(foreground_symbols, foreground_colors, foreground_highlights);
+        let background_animation = load_animation(background_symbols, background_colors, background_highlights);
     
         let mut rng = rand::thread_rng();
         return Self {

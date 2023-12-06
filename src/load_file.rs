@@ -6,50 +6,50 @@ use crossterm::style::Color;
 extern crate serde_json;
 use self::serde_json::*;
 
-pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Vec<Vec<Vec<ColorGlyph>>> {
+pub fn load_animation(symbols: &Value, colors: &Value, highlights: &Value) -> Vec<Vec<Vec<ColorGlyph>>> {
     let mut out_animation: Vec<Vec<Vec<ColorGlyph>>> = Vec::new();
-    
-    if !animation_symbols.is_array() { 
-        println!("symbols is not array");
-    }
-    let num_frames = animation_symbols.as_array().unwrap().len();
-    if !animation_symbols[0].is_array() { 
-        println!("symbols[0] is not array"); 
-    }
-    let num_lines = animation_symbols[0].as_array().unwrap().len();
-    if !animation_symbols[0][0].is_string() { 
-        println!("symbols[0][0] is not a string"); 
-    }
-    let num_symbols = animation_symbols[0][0].as_str().unwrap().len();
+
+    check_format(&symbols, "symbols");
+    check_format(&colors, "colors");
+    check_format(&highlights, "highlights");
+
+    let num_frames = symbols.as_array().unwrap().len();
+    let num_lines = symbols[0].as_array().unwrap().len();
+    let num_symbols = symbols[0][0].as_str().unwrap().len();
 
     for frame_idx in 0..num_frames {
         let mut out_frame: Vec<Vec<ColorGlyph>> = Vec::new();
-        if !animation_symbols[frame_idx].is_array() { 
-            println!("symbols[{}] is not an array", frame_idx); 
-        }
-        if animation_symbols[frame_idx].as_array().unwrap().len() != num_lines {
-            println!("symbols[{}] differs in length from symbols[0]", frame_idx);
-        }
+
+        check_array(&symbols[frame_idx], num_lines, 
+                    &format!("symbols[{}]", frame_idx));
+        check_array(&colors[frame_idx], num_lines, 
+                    &format!("colors[{}]", frame_idx));
+        check_array(&highlights[frame_idx], num_lines, 
+                    &format!("highlights[{}]", frame_idx));
+
         for line_idx in 0..num_lines {
             let mut out_line: Vec<ColorGlyph> = Vec::new();
-            if !animation_symbols[frame_idx][line_idx].is_string() { 
-                println!("symbols[{}][{}] is not a string", frame_idx, line_idx); 
-            }
-            let line = animation_symbols[frame_idx][line_idx].as_str().unwrap();
-            if line.len() != num_symbols {
-                println!("symbols[{}][{}] differs in length from symbols[0][0]", frame_idx, line_idx);
-            } 
+
+            check_string(&symbols[frame_idx][line_idx], num_symbols, 
+                         &format!("symbols[{}][{}]", frame_idx, line_idx));
+            check_string(&colors[frame_idx][line_idx], num_symbols);
+                         &format!("colors[{}][{}]", frame_idx, line_idx));
+            check_string(&highlights[frame_idx][line_idx], num_symbols);
+                         &format!("highlights[{}][{}]", frame_idx, line_idx));
+
+            let line = symbols[frame_idx][line_idx].as_str().unwrap();
+
             for symbol_idx in 0..num_symbols {
                 out_line.push(ColorGlyph{
                     glyph: line.chars().nth(symbol_idx).unwrap(),
                     foreground_color: match_color( 
-                        animation_colors.get("foreground").unwrap()
+                        colors
                         .as_array().unwrap()[frame_idx]
                         .as_array().unwrap()[line_idx]
                         .as_str().unwrap().chars().nth(symbol_idx).unwrap()
                     ),
                     background_color: match_color( 
-                        animation_colors.get("background").unwrap()
+                        highlights
                         .as_array().unwrap()[frame_idx]
                         .as_array().unwrap()[line_idx]
                         .as_str().unwrap().chars().nth(symbol_idx).unwrap()
@@ -61,6 +61,36 @@ pub fn load_animation(animation_symbols: &Value, animation_colors: &Value) -> Ve
         out_animation.push(out_frame);
     }
     return out_animation;
+}
+
+pub fn check_format(json_array: &Value, name: &str) {
+    if !json_array.is_array() { 
+        panic!("{} is not an array", name);
+    }
+    if !json_array[0].is_array() { 
+        panic!("{}[0] is not an array", name); 
+    }
+    if !json_array[0][0].is_string() { 
+        panic!("{}[0][0] is not a string", name); 
+    }
+}
+
+pub fn check_array(json_array: &Value, target_size: usize, name: &str) {
+    if !json_array.is_array() { 
+        panic!("{} is not an array", name); 
+    }
+    if json_array.as_array().unwrap().len() != target_size {
+        panic!("{} differs in length", name);
+    }
+}
+
+pub fn check_string(json_string: &Value, target_size: usize, name: &str) {
+    if !json_string.is_string() { 
+        panic!("{} is not a string", name); 
+    }
+    if json_string.as_str().unwrap().len() != target_size {
+        panic!("{} differs in length", name);
+    }
 }
 
 fn match_color(color: char) -> Option<Color> {

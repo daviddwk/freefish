@@ -1,34 +1,38 @@
 {
-    "animation": {
-        "symbols": [
+    "animation": 
+    {
+        "symbols": 
+        [
             ["><v>"],
             ["><^>"]
         ],
-        "colors": {
-            "foreground": [
-                ["mmmm"],
-                ["mmrm"]
-            ],
-            "background": [
-                ["    "],
-                ["    "]
-            ]
-        }
+        "colors": 
+        [
+            ["mmmm"],
+            ["mmrm"]
+        ],
+        "highlights": 
+        [
+            ["mmmm"],
+            ["mmrm"]
+        ]
     },
-    "flipped_animation": {
-        "symbols": [
+    "flipped_animation": 
+    {
+        "symbols": 
+        [
             ["<v><"],
             ["<^><"]
         ],
-        "colors": {
-            "foreground": [
-                ["mmmm"],
-                ["mrmm"]
-            ],
-            "background": [
-                ["    "],
-                ["    "]
-            ]
-        }
+        "colors": 
+        [
+            ["mmmm"],
+            ["mrmm"]
+        ],
+        "highlights":
+        [
+            ["    "],
+            ["    "]
+        ]
     }
 }

@@ -30,13 +30,17 @@ impl Fish {
             .expect("file should have animation/symbols key");
         let anim_colors = json.pointer("/animation/colors")
             .expect("file should have animation/colors key");
+        let anim_highlights = json.pointer("/animation/highlights")
+            .expect("file should have animation/highlights key");
         let flip_symbols = json.pointer("/flipped_animation/symbols")
             .expect("file should have flipped_animation/symbols key");
         let flip_colors = json.pointer("/flipped_animation/colors")
             .expect("file should have flipped_animation/colors key");
+        let flip_highlights = json.pointer("/flipped_animation/highlights")
+            .expect("file should have flipped_animation/highlights key");
         
-        let fish_frames = load_animation(anim_symbols, anim_colors);
-        let flip_frames = load_animation(flip_symbols, flip_colors);
+        let fish_frames = load_animation(anim_symbols, anim_colors, anim_highlights);
+        let flip_frames = load_animation(flip_symbols, flip_colors, flip_highlights);
 
         if fish_frames.len() != flip_frames.len() ||
            fish_frames[0].len() != flip_frames[0].len() ||
