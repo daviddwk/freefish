@@ -32,9 +32,9 @@ pub fn load_animation(symbols: &Value, colors: &Value, highlights: &Value) -> Ve
 
             check_string(&symbols[frame_idx][line_idx], num_symbols, 
                          &format!("symbols[{}][{}]", frame_idx, line_idx));
-            check_string(&colors[frame_idx][line_idx], num_symbols);
+            check_string(&colors[frame_idx][line_idx], num_symbols,
                          &format!("colors[{}][{}]", frame_idx, line_idx));
-            check_string(&highlights[frame_idx][line_idx], num_symbols);
+            check_string(&highlights[frame_idx][line_idx], num_symbols,
                          &format!("highlights[{}][{}]", frame_idx, line_idx));
 
             let line = symbols[frame_idx][line_idx].as_str().unwrap();
