@@ -51,11 +51,15 @@ impl Fish {
         if fish_frames.len() != flip_frames.len(){
             panic!("{} mismatch fish and flip number of frames", name);
         }
+
         let mut rng = rand::thread_rng();
+        let fish_size = (fish_frames[0].len(), fish_frames[0][0].len());
         return Self {
-            pos:        (rng.gen_range(tank.depth..tank.size.0), rng.gen_range(0..tank.size.1)),
-            dest:       (rng.gen_range(tank.depth..tank.size.0), rng.gen_range(0..tank.size.1)),
-            size:       (fish_frames[0].len(), fish_frames[0][0].len()),
+            pos:        (rng.gen_range(0..=tank.size.0 - fish_size.0),
+                         rng.gen_range(0..=tank.size.1 - fish_size.1)),
+            dest:       (rng.gen_range(0..=tank.size.0 - fish_size.0),
+                         rng.gen_range(0..=tank.size.1 - fish_size.1)),
+            size:       fish_size,
             tank_size:  tank.size,
             tank_depth: tank.depth,
             flip:       rng.gen::<bool>(),
@@ -83,10 +87,8 @@ impl Fish {
         }
         if self.pos == self.dest {
             let mut rng = rand::thread_rng();
-            self.dest = (
-                rng.gen_range(self.tank_depth..self.tank_size.0), 
-                rng.gen_range(0..self.tank_size.1)
-            );
+            self.dest = (rng.gen_range(0..=self.tank_size.0 - self.size.0),
+                         rng.gen_range(0..=self.tank_size.1 - self.size.1));
         }
     }
 
