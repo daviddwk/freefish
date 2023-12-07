@@ -21,18 +21,14 @@ pub struct Fish {
 }
 
 impl Fish {
-    pub fn new(name: String, tank: &Tank) -> Self {
-        let fish_file = File::open(name.clone() + ".json")
-            .expect("file should open");
+    pub fn new(name: &str, tank: &Tank) -> Self {
+        let fish_file = File::open(format!("{}.json", name))
+            .expect(&format!("{}.json should open", name));
         let fish_json: serde_json::Value = serde_json::from_reader(fish_file)
-            .expect("file should be JSON");
-        let anim_json = fish_json.pointer("/animation")
-            .expect("file should have animation");
-        let flip_json = fish_json.pointer("/flipped_animation")
-            .expect("file should have flipped_animation");
+            .expect(&format!("{}.json should be JSON", name));
         
-        let fish_anim = load_animation(anim_json);
-        let flip_anim = load_animation(flip_json);
+        let fish_anim = load_animation(&fish_json, &format!("fish {}", name), "/animation");
+        let flip_anim = load_animation(&fish_json, &format!("fish {}", name), "/flipped_animation");
 
         if fish_anim.len() != flip_anim.len() ||
            fish_anim[0].len() != flip_anim[0].len() ||

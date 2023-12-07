@@ -15,34 +15,28 @@ pub struct Tank {
     pub bg_anim: Vec<Vec<Vec<ColorGlyph>>>
 }
 impl Tank {
-    pub fn new(name: String) -> Self {
-        let tank_file = File::open(name.clone() + ".json")
-            .expect("tank file should open");
-        println!("{}", name);
-        let tank_json: serde_json::Value = 
-            serde_json::from_reader(tank_file)
-            .expect("file should be JSON");
-        let foreground_json = tank_json.pointer("/foreground")
-            .expect("file should have foreground");
-        let background_json = tank_json.pointer("/background")
-            .expect("file should have background");
-
+    pub fn new(name: &str) -> Self {
+        let tank_file = File::open(format!("{}.json", name))
+            .expect(&format!("{}.json should open", name));
+        let tank_json: serde_json::Value = serde_json::from_reader(tank_file)
+            .expect(&format!("{}.json should be JSON", name));
         let mut depth: usize = 0;
+        
+        let fg_anim = load_animation(&tank_json, &format!("tank {}", name), "/foreground");
+        let bg_anim = load_animation(&tank_json, &format!("tank {}", name), "/background");
+        
         if tank_json["depth"].is_u64() {
             depth = usize::try_from(tank_json["depth"].as_u64().unwrap()).unwrap();
         }
-
-        let foreground_animation = load_animation(foreground_json);
-        let background_animation = load_animation(background_json);
     
         let mut rng = rand::thread_rng();
         return Self {
-            size:     (foreground_animation[0].len(), foreground_animation[0][0].len()),
+            size:     (fg_anim[0].len(), fg_anim[0][0].len()),
             depth:    depth,
-            fg_frame: rng.gen_range(0..foreground_animation.len()),
-            bg_frame: rng.gen_range(0..background_animation.len()),
-            fg_anim:  foreground_animation, 
-            bg_anim:  background_animation
+            fg_frame: rng.gen_range(0..fg_anim.len()),
+            bg_frame: rng.gen_range(0..bg_anim.len()),
+            fg_anim:  fg_anim, 
+            bg_anim:  bg_anim
         }
     }
     pub fn update(&mut self) {

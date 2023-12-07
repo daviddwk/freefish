@@ -23,45 +23,45 @@ pub struct Duck {
 }
 
 impl Duck {
-    pub fn new(name: String, tank: &Tank) -> Self {
-        let duck_file = File::open(name.clone() + ".json")
-            .expect("file should open");
+    pub fn new(name: &str, tank: &Tank) -> Self {
+        let duck_file = File::open(format!("{}.json", name))
+            .expect(&format!("{}.json should open", name));
         let duck_json: serde_json::Value = serde_json::from_reader(duck_file)
-            .expect("file should be JSON");
-        let anim_json = duck_json.pointer("/animation")
-            .expect("file should have animation");
-        let flip_json = duck_json.pointer("/flipped_animation")
-            .expect("file should have flipped_animation");
+            .expect(&format!("{}.json should be JSON", name));
+        
+        let duck_anim = load_animation(&duck_json, &format!("tank {}", name), "/animation");
+        let flip_anim = load_animation(&duck_json, &format!("tank {}", name), "/flipped_animation");
+
         let mut bouyancy: usize = 0;
         if duck_json["depth"].is_u64() {
             bouyancy = usize::try_from(duck_json["depth"].as_u64().unwrap()).unwrap();
-            println!("{}fdfdffd", bouyancy + tank.depth);
         }
         
-        let duck_frames = load_animation(anim_json);
-        let flip_frames = load_animation(flip_json);
+        /* TODO: redo with better errors
 
-        if duck_frames.len() != flip_frames.len() ||
-           duck_frames[0].len() != flip_frames[0].len() ||
-           duck_frames[0][0].len() != flip_frames[0][0].len()
+        if duck_anim.len() != flip_anim.len() ||
+           duck_anim[0].len() != flip_anim[0].len() ||
+           duck_anim[0][0].len() != flip_anim[0][0].len()
         {
-            panic!("{} mismatch duck and flip size", name);
+            panic!("{}.json mismatch size of animation and flipped_animation", name);
         }
-        if duck_frames.len() != flip_frames.len(){
+        if duck_anim.len() != flip_anim.len(){
+            panic!("{}.json mismatch size of animation and flipped_animation", name);
             panic!("{} mismatch duck and flip number of frames", name);
         }
+        */
         let mut rng = rand::thread_rng();
         return Self {
             pos:        (tank.depth - bouyancy, rng.gen_range(0..tank.size.1)),
             dest:       (tank.depth - bouyancy, rng.gen_range(0..tank.size.1)),
-            size:       (duck_frames[0].len(), duck_frames[0][0].len()),
+            size:       (duck_anim[0].len(), duck_anim[0][0].len()),
             bouyancy:   bouyancy,
             tank_size:  tank.size,
             tank_depth: tank.depth,
             flip:       rng.gen::<bool>(),
-            frame:      rng.gen_range(0..duck_frames.len()),
-            duck_anim:  duck_frames,
-            flip_anim:  flip_frames,
+            frame:      rng.gen_range(0..duck_anim.len()),
+            duck_anim:  duck_anim,
+            flip_anim:  flip_anim,
         }
     }
     pub fn update(&mut self) {
