@@ -6,8 +6,15 @@ use crossterm::style::Color;
 extern crate serde_json;
 use self::serde_json::*;
 
-pub fn load_animation(symbols: &Value, colors: &Value, highlights: &Value) -> Vec<Vec<Vec<ColorGlyph>>> {
-    let mut out_animation: Vec<Vec<Vec<ColorGlyph>>> = Vec::new();
+pub fn load_animation(json_anim: &Value) -> Vec<Vec<Vec<ColorGlyph>>> {
+    let mut out_anim: Vec<Vec<Vec<ColorGlyph>>> = Vec::new();
+    
+    let symbols = json_anim.pointer("/symbols")
+        .expect("animation should have symbols");
+    let colors = json_anim.pointer("/colors")
+        .expect("animation should have colors");
+    let highlights = json_anim.pointer("/highlights")
+        .expect("animation should have highilghts");
 
     check_format(&symbols, "symbols");
     check_format(&colors, "colors");
@@ -58,9 +65,9 @@ pub fn load_animation(symbols: &Value, colors: &Value, highlights: &Value) -> Ve
             }
             out_frame.push(out_line);
         }
-        out_animation.push(out_frame);
+        out_anim.push(out_frame);
     }
-    return out_animation;
+    return out_anim;
 }
 
 pub fn check_format(json_array: &Value, name: &str) {

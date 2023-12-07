@@ -24,36 +24,28 @@ impl Fish {
     pub fn new(name: String, tank: &Tank) -> Self {
         let fish_file = File::open(name.clone() + ".json")
             .expect("file should open");
-        let json: serde_json::Value = serde_json::from_reader(fish_file)
+        let fish_json: serde_json::Value = serde_json::from_reader(fish_file)
             .expect("file should be JSON");
-        let anim_symbols = json.pointer("/animation/symbols")
-            .expect("file should have animation/symbols key");
-        let anim_colors = json.pointer("/animation/colors")
-            .expect("file should have animation/colors key");
-        let anim_highlights = json.pointer("/animation/highlights")
-            .expect("file should have animation/highlights key");
-        let flip_symbols = json.pointer("/flipped_animation/symbols")
-            .expect("file should have flipped_animation/symbols key");
-        let flip_colors = json.pointer("/flipped_animation/colors")
-            .expect("file should have flipped_animation/colors key");
-        let flip_highlights = json.pointer("/flipped_animation/highlights")
-            .expect("file should have flipped_animation/highlights key");
+        let anim_json = fish_json.pointer("/animation")
+            .expect("file should have animation");
+        let flip_json = fish_json.pointer("/flipped_animation")
+            .expect("file should have flipped_animation");
         
-        let fish_frames = load_animation(anim_symbols, anim_colors, anim_highlights);
-        let flip_frames = load_animation(flip_symbols, flip_colors, flip_highlights);
+        let fish_anim = load_animation(anim_json);
+        let flip_anim = load_animation(flip_json);
 
-        if fish_frames.len() != flip_frames.len() ||
-           fish_frames[0].len() != flip_frames[0].len() ||
-           fish_frames[0][0].len() != flip_frames[0][0].len()
+        if fish_anim.len() != flip_anim.len() ||
+           fish_anim[0].len() != flip_anim[0].len() ||
+           fish_anim[0][0].len() != flip_anim[0][0].len()
         {
             panic!("{} mismatch fish and flip size", name);
         }
-        if fish_frames.len() != flip_frames.len(){
+        if fish_anim.len() != flip_anim.len(){
             panic!("{} mismatch fish and flip number of frames", name);
         }
 
         let mut rng = rand::thread_rng();
-        let fish_size = (fish_frames[0].len(), fish_frames[0][0].len());
+        let fish_size = (fish_anim[0].len(), fish_anim[0][0].len());
         return Self {
             pos:        (rng.gen_range(0..=tank.size.0 - fish_size.0),
                          rng.gen_range(0..=tank.size.1 - fish_size.1)),
@@ -63,9 +55,9 @@ impl Fish {
             tank_size:  tank.size,
             tank_depth: tank.depth,
             flip:       rng.gen::<bool>(),
-            frame:      rng.gen_range(0..fish_frames.len()),
-            fish_anim:  fish_frames,
-            flip_anim:  flip_frames,
+            frame:      rng.gen_range(0..fish_anim.len()),
+            fish_anim:  fish_anim,
+            flip_anim:  flip_anim,
         }
     }
     pub fn update(&mut self) {

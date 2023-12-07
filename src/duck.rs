@@ -28,26 +28,18 @@ impl Duck {
             .expect("file should open");
         let duck_json: serde_json::Value = serde_json::from_reader(duck_file)
             .expect("file should be JSON");
-        let anim_symbols = duck_json.pointer("/animation/symbols")
-            .expect("file should have animation/symbols key");
-        let anim_colors = duck_json.pointer("/animation/colors")
-            .expect("file should have animation/colors key");
-        let anim_highlights = duck_json.pointer("/animation/highlights")
-            .expect("file should have animation/highlights key");
-        let flip_symbols = duck_json.pointer("/flipped_animation/symbols")
-            .expect("file should have flipped_animation/symbols key");
-        let flip_colors = duck_json.pointer("/flipped_animation/colors")
-            .expect("file should have flipped_animation/colors key");
-        let flip_highlights = duck_json.pointer("/flipped_animation/highlights")
-            .expect("file should have flipped_animation/highlights key");
+        let anim_json = duck_json.pointer("/animation")
+            .expect("file should have animation");
+        let flip_json = duck_json.pointer("/flipped_animation")
+            .expect("file should have flipped_animation");
         let mut bouyancy: usize = 0;
         if duck_json["depth"].is_u64() {
             bouyancy = usize::try_from(duck_json["depth"].as_u64().unwrap()).unwrap();
             println!("{}fdfdffd", bouyancy + tank.depth);
         }
         
-        let duck_frames = load_animation(anim_symbols, anim_colors, anim_highlights);
-        let flip_frames = load_animation(flip_symbols, flip_colors, anim_highlights);
+        let duck_frames = load_animation(anim_json);
+        let flip_frames = load_animation(flip_json);
 
         if duck_frames.len() != flip_frames.len() ||
            duck_frames[0].len() != flip_frames[0].len() ||
