@@ -6,15 +6,14 @@ use crossterm::style::Color;
 extern crate serde_json;
 use self::serde_json::*;
 
-pub fn load_animation(json_anim: &Value) -> Vec<Vec<Vec<ColorGlyph>>> {
+pub fn load_animation(json: &Value, name: &str, anim_key: &str) -> Vec<Vec<Vec<ColorGlyph>>> {
     let mut out_anim: Vec<Vec<Vec<ColorGlyph>>> = Vec::new();
-    
-    let symbols = json_anim.pointer("/symbols")
-        .expect("animation should have symbols");
-    let colors = json_anim.pointer("/colors")
-        .expect("animation should have colors");
-    let highlights = json_anim.pointer("/highlights")
-        .expect("animation should have highilghts");
+    let symbols = json.pointer(&format!("{}/symbols", anim_key))
+        .expect(&format!("{} should have symbols key", anim_key));
+    let colors = json.pointer(&format!("{}/colors", anim_key))
+        .expect(&format!("{} should have colors key", anim_key));
+    let highlights = json.pointer(&format!("{}/highlights", anim_key))
+        .expect(&format!("{} should have highlights key", anim_key));
 
     check_format(&symbols, "symbols");
     check_format(&colors, "colors");
@@ -24,25 +23,29 @@ pub fn load_animation(json_anim: &Value) -> Vec<Vec<Vec<ColorGlyph>>> {
     let num_lines = symbols[0].as_array().unwrap().len();
     let num_symbols = symbols[0][0].as_str().unwrap().len();
 
+    check_array(&symbols, num_frames, &format!("{} symbols", name));
+    check_array(&colors, num_frames, &format!("{} colors", name));
+    check_array(&highlights, num_frames, &format!("{} highlights", name));
+
     for frame_idx in 0..num_frames {
         let mut out_frame: Vec<Vec<ColorGlyph>> = Vec::new();
 
         check_array(&symbols[frame_idx], num_lines, 
-                    &format!("symbols[{}]", frame_idx));
+                    &format!("{} symbols[{}]", name, frame_idx));
         check_array(&colors[frame_idx], num_lines, 
-                    &format!("colors[{}]", frame_idx));
+                    &format!("{} colors[{}]", name, frame_idx));
         check_array(&highlights[frame_idx], num_lines, 
-                    &format!("highlights[{}]", frame_idx));
+                    &format!("{} highlights[{}]", name, frame_idx));
 
         for line_idx in 0..num_lines {
             let mut out_line: Vec<ColorGlyph> = Vec::new();
 
             check_string(&symbols[frame_idx][line_idx], num_symbols, 
-                         &format!("symbols[{}][{}]", frame_idx, line_idx));
+                         &format!("{} symbols[{}][{}]", name, frame_idx, line_idx));
             check_string(&colors[frame_idx][line_idx], num_symbols,
-                         &format!("colors[{}][{}]", frame_idx, line_idx));
+                         &format!("{} colors[{}][{}]", name, frame_idx, line_idx));
             check_string(&highlights[frame_idx][line_idx], num_symbols,
-                         &format!("highlights[{}][{}]", frame_idx, line_idx));
+                         &format!("{} highlights[{}][{}]", name, frame_idx, line_idx));
 
             let line = symbols[frame_idx][line_idx].as_str().unwrap();
 
