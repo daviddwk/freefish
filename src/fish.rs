@@ -12,6 +12,7 @@ pub struct Fish {
     pos: (usize, usize),
     dest: (usize, usize),
     size: (usize, usize),
+    wait: usize,
     tank_depth: usize,
     tank_size: (usize, usize),
     flip: bool,
@@ -43,11 +44,12 @@ impl Fish {
         let mut rng = rand::thread_rng();
         let fish_size = (fish_anim[0].len(), fish_anim[0][0].len());
         return Self {
-            pos:        (rng.gen_range(0..=tank.size.0 - fish_size.0),
+            pos:        (rng.gen_range(0 + tank.depth..=tank.size.0 - fish_size.0),
                          rng.gen_range(0..=tank.size.1 - fish_size.1)),
-            dest:       (rng.gen_range(0..=tank.size.0 - fish_size.0),
+            dest:       (rng.gen_range(0 + tank.depth..=tank.size.0 - fish_size.0),
                          rng.gen_range(0..=tank.size.1 - fish_size.1)),
             size:       fish_size,
+            wait:       0,
             tank_size:  tank.size,
             tank_depth: tank.depth,
             flip:       rng.gen::<bool>(),
@@ -61,22 +63,27 @@ impl Fish {
         if self.frame == self.fish_anim.len() {
             self.frame = 0;
         }
-        if self.pos.0 < self.dest.0 {
-            self.pos.0 += 1;
-        } else if self.pos.0 > self.dest.0 {
-            self.pos.0 -= 1;
-        }
-        if self.pos.1 < self.dest.1 {
-            self.pos.1 += 1;
-            self.flip = false;
-        } else if self.pos.1 > self.dest.1 {
-            self.pos.1 -= 1;
-            self.flip = true;
-        }
-        if self.pos == self.dest {
-            let mut rng = rand::thread_rng();
-            self.dest = (rng.gen_range(0..=self.tank_size.0 - self.size.0),
-                         rng.gen_range(0..=self.tank_size.1 - self.size.1));
+        if self.wait == 0 {
+            if self.pos.0 < self.dest.0 {
+                self.pos.0 += 1;
+            } else if self.pos.0 > self.dest.0 {
+                self.pos.0 -= 1;
+            }
+            if self.pos.1 < self.dest.1 {
+                self.pos.1 += 1;
+                self.flip = false;
+            } else if self.pos.1 > self.dest.1 {
+                self.pos.1 -= 1;
+                self.flip = true;
+            }
+            if self.pos == self.dest {
+                let mut rng = rand::thread_rng();
+                self.dest = (rng.gen_range(0 + self.tank_depth..=self.tank_size.0 - self.size.0),
+                             rng.gen_range(0..=self.tank_size.1 - self.size.1));
+                self.wait = 5;
+            }
+        } else {
+            self.wait -= 1;
         }
     }
 
