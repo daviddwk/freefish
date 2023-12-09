@@ -127,7 +127,7 @@ fn main() {
             print!("\n");
         }
         for fish_idx in 0..fishies.len() {
-            fishies[fish_idx].update();
+            fishies[fish_idx].update(&tank);
         }
         for duck_idx in 0..duckies.len() {
             duckies[duck_idx].update();

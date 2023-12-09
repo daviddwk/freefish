@@ -13,12 +13,12 @@ pub struct Fish {
     dest: (usize, usize),
     size: (usize, usize),
     wait: usize,
-    tank_depth: usize,
-    tank_size: (usize, usize),
     flip: bool,
+    idle: bool,
     frame: usize,
     fish_anim: Vec<Vec<Vec<ColorGlyph>>>,
     flip_anim: Vec<Vec<Vec<ColorGlyph>>>,
+    idle_anim: Vec<Vec<Vec<ColorGlyph>>>
 }
 
 impl Fish {
@@ -30,7 +30,12 @@ impl Fish {
         
         let fish_anim = load_animation(&fish_json, &format!("fish {}", name), "/animation");
         let flip_anim = load_animation(&fish_json, &format!("fish {}", name), "/flipped_animation");
-
+        let mut idle_anim = Vec::new();
+        let mut idle = false;
+        if !fish_json["idle_animation"].is_null() {
+            idle = true;
+            idle_anim = load_animation(&fish_json, &format!("fish {}", name), "/idle_animation");
+        }
         if fish_anim.len() != flip_anim.len() ||
            fish_anim[0].len() != flip_anim[0].len() ||
            fish_anim[0][0].len() != flip_anim[0][0].len()
@@ -50,15 +55,15 @@ impl Fish {
                          rng.gen_range(0..=tank.size.1 - fish_size.1)),
             size:       fish_size,
             wait:       0,
-            tank_size:  tank.size,
-            tank_depth: tank.depth,
             flip:       rng.gen::<bool>(),
             frame:      rng.gen_range(0..fish_anim.len()),
+            idle:       idle,
             fish_anim:  fish_anim,
             flip_anim:  flip_anim,
+            idle_anim:  idle_anim
         }
     }
-    pub fn update(&mut self) {
+    pub fn update(&mut self, tank: &Tank) {
         self.frame += 1;
         if self.frame == self.fish_anim.len() {
             self.frame = 0;
@@ -78,8 +83,8 @@ impl Fish {
             }
             if self.pos == self.dest {
                 let mut rng = rand::thread_rng();
-                self.dest = (rng.gen_range(0 + self.tank_depth..=self.tank_size.0 - self.size.0),
-                             rng.gen_range(0..=self.tank_size.1 - self.size.1));
+                self.dest = (rng.gen_range(0 + tank.depth..=tank.size.0 - self.size.0),
+                             rng.gen_range(0..=tank.size.1 - self.size.1));
                 self.wait = 5;
             }
         } else {
@@ -96,7 +101,9 @@ impl Fish {
         }
 
         let glyph: &ColorGlyph;
-        if self.flip {
+        if self.wait != 0 && self.idle == true {
+            return Some(&self.idle_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1]) 
+        } else if self.flip {
             glyph = &self.flip_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1];
         } else {
             glyph = &self.fish_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1];
