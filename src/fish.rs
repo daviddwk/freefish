@@ -7,6 +7,7 @@ use load_file::*;
 use tank::*;
 use load_file::*;
 use color_glyph::*;
+use glyph_from_animation::*;
 
 pub struct Fish {
     pos: (usize, usize),
@@ -93,7 +94,7 @@ impl Fish {
     }
 
     pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<&ColorGlyph> {
-
+        /*
         if row_idx >= self.size.0 + self.pos.0 || row_idx < self.pos.0 ||
            glyph_idx >= self.size.1 + self.pos.1 || glyph_idx < self.pos.1
         {
@@ -102,7 +103,7 @@ impl Fish {
 
         let glyph: &ColorGlyph;
         if self.wait != 0 && self.idle == true {
-            return Some(&self.idle_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1]) 
+            return Some(&self.idle_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1]); 
         } else if self.flip {
             glyph = &self.flip_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1];
         } else {
@@ -112,8 +113,17 @@ impl Fish {
         if glyph.glyph == ' '  {
             return None;
         }
-
-        return Some(glyph);
+        */
+        if self.wait != 0 && self.idle == true {
+            return glyph_from_animation(&self.idle_anim,
+                self.frame, row_idx, glyph_idx, self.pos);
+        } else if self.flip {
+            return glyph_from_animation(&self.flip_anim,
+                self.frame, row_idx, glyph_idx, self.pos);
+        } else {
+            return glyph_from_animation(&self.fish_anim,
+                self.frame, row_idx, glyph_idx, self.pos);
+        }
     }
 }
 

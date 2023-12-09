@@ -17,6 +17,7 @@ mod tank;
 mod load_file;
 mod color_glyph;
 mod duck;
+mod glyph_from_animation;
 
 use fish::*;
 use duck::*;
