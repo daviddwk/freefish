@@ -7,7 +7,6 @@ use load_file::*;
 use tank::*;
 use load_file::*;
 use color_glyph::*;
-use glyph_from_animation::*;
 
 pub struct Fish {
     pos: (usize, usize),
@@ -17,9 +16,9 @@ pub struct Fish {
     flip: bool,
     idle: bool,
     frame: usize,
-    fish_anim: Vec<Vec<Vec<ColorGlyph>>>,
-    flip_anim: Vec<Vec<Vec<ColorGlyph>>>,
-    idle_anim: Vec<Vec<Vec<ColorGlyph>>>
+    fish_anim: Animation,
+    flip_anim: Animation, 
+    idle_anim: Animation
 }
 
 impl Fish {
@@ -47,21 +46,21 @@ impl Fish {
             panic!("{} mismatch fish and flip number of frames", name);
         }
 
-        let mut rng = rand::thread_rng();
-        let fish_size = (fish_anim[0].len(), fish_anim[0][0].len());
+        let mut rng = rand::thread_rng(); 
+        let size = (fish_anim[0].len(), fish_anim[0][0].len());
         return Self {
-            pos:        (rng.gen_range(0 + tank.depth..=tank.size.0 - fish_size.0),
-                         rng.gen_range(0..=tank.size.1 - fish_size.1)),
-            dest:       (rng.gen_range(0 + tank.depth..=tank.size.0 - fish_size.0),
-                         rng.gen_range(0..=tank.size.1 - fish_size.1)),
-            size:       fish_size,
+            pos:        (rng.gen_range(0 + tank.depth..=tank.size.0 - size.0),
+                         rng.gen_range(0..=tank.size.1 - size.1)),
+            dest:       (rng.gen_range(0 + tank.depth..=tank.size.0 - size.0),
+                         rng.gen_range(0..=tank.size.1 - size.1)),
+            size,       
             wait:       0,
             flip:       rng.gen::<bool>(),
             frame:      rng.gen_range(0..fish_anim.len()),
-            idle:       idle,
-            fish_anim:  fish_anim,
-            flip_anim:  flip_anim,
-            idle_anim:  idle_anim
+            idle,
+            fish_anim,
+            flip_anim, 
+            idle_anim, 
         }
     }
     pub fn update(&mut self, tank: &Tank) {
@@ -94,36 +93,33 @@ impl Fish {
     }
 
     pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<&ColorGlyph> {
-        /*
-        if row_idx >= self.size.0 + self.pos.0 || row_idx < self.pos.0 ||
-           glyph_idx >= self.size.1 + self.pos.1 || glyph_idx < self.pos.1
-        {
-            return None;
-        }
-
-        let glyph: &ColorGlyph;
+        let glyph: Option<&ColorGlyph>;
         if self.wait != 0 && self.idle == true {
-            return Some(&self.idle_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1]); 
-        } else if self.flip {
-            glyph = &self.flip_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1];
-        } else {
-            glyph = &self.fish_anim[self.frame][row_idx - self.pos.0][glyph_idx - self.pos.1];
-        }
-
-        if glyph.glyph == ' '  {
-            return None;
-        }
-        */
-        if self.wait != 0 && self.idle == true {
-            return glyph_from_animation(&self.idle_anim,
+            glyph = glyph_from_animation(&self.idle_anim,
                 self.frame, row_idx, glyph_idx, self.pos);
         } else if self.flip {
-            return glyph_from_animation(&self.flip_anim,
+            glyph = glyph_from_animation(&self.flip_anim,
                 self.frame, row_idx, glyph_idx, self.pos);
         } else {
-            return glyph_from_animation(&self.fish_anim,
+            glyph = glyph_from_animation(&self.fish_anim,
                 self.frame, row_idx, glyph_idx, self.pos);
         }
+        if glyph.is_some() && glyph.unwrap().glyph == ' ' {
+            return None;
+        }
+        return glyph;        
     }
+    /*
+    fn max_animation_size(animations: Vec<&Vec<Vec<Vec<ColorGlyph>>>>) -> (usize, usize) {
+        let mut max_size = (0, 0);
+        for a in animations {
+            if a[0].len() > max_size.0{
+                max_size.0 = a[0].len();
+            }
+            if a[0][0].len() > 
+        }
+        return max_size;
+    }
+    */
 }
 

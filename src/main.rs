@@ -10,14 +10,13 @@ extern crate home;
 
 use std::env;
 use std::thread;
-use std::time;
+use std::time;use::color_glyph::*;
 
 mod fish;
 mod tank;
 mod load_file;
 mod color_glyph;
 mod duck;
-mod glyph_from_animation;
 
 use fish::*;
 use duck::*;
