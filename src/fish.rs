@@ -14,7 +14,6 @@ pub struct Fish {
     size: (usize, usize),
     wait: usize,
     flip: bool,
-    idle: bool,
     frame: usize,
     fish_anim: Animation,
     flip_anim: Animation, 
@@ -30,10 +29,10 @@ impl Fish {
         
         let fish_anim = load_animation(&fish_json, &format!("fish {}", name), "/animation");
         let flip_anim = load_animation(&fish_json, &format!("fish {}", name), "/flipped_animation");
-        let mut idle_anim = Vec::new();
-        let mut idle = false;
-        if !fish_json["idle_animation"].is_null() {
-            idle = true;
+        let idle_anim: Animation;
+        if fish_json["idle_animation"].is_null() {
+            idle_anim = Vec::new(); 
+        } else {
             idle_anim = load_animation(&fish_json, &format!("fish {}", name), "/idle_animation");
         }
         if fish_anim.len() != flip_anim.len() ||
@@ -57,7 +56,6 @@ impl Fish {
             wait:       0,
             flip:       rng.gen::<bool>(),
             frame:      rng.gen_range(0..fish_anim.len()),
-            idle,
             fish_anim,
             flip_anim, 
             idle_anim, 
@@ -94,7 +92,7 @@ impl Fish {
 
     pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<&ColorGlyph> {
         let glyph: Option<&ColorGlyph>;
-        if self.wait != 0 && self.idle == true {
+        if self.wait != 0 && self.idle_anim.len() != 0 {
             glyph = glyph_from_animation(&self.idle_anim,
                 self.frame, row_idx, glyph_idx, self.pos);
         } else if self.flip {

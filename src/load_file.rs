@@ -150,8 +150,7 @@ pub fn glyph_from_animation(anim: &Vec<Vec<Vec<ColorGlyph>>>, frame_idx: usize, 
     if frame_idx_oob {
         panic!("Attempted to access frame out of bounds")
     }
-    let row_idx_oob = (row_idx < position.0) ||
-                      (row_idx - position.0 >= anim[frame_idx].len());
+    let row_idx_oob = (row_idx < position.0) || (row_idx - position.0 >= anim[frame_idx].len());
     if row_idx_oob {
         return None;
     }
