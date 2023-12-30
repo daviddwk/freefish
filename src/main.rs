@@ -1,4 +1,6 @@
 use std::io::{self};
+use std::fs::{create_dir, create_dir_all};
+use std::path::{PathBuf, Path};
 extern crate crossterm;
 extern crate rand;
 use crossterm::{
@@ -7,6 +9,7 @@ use crossterm::{
     terminal::Clear,
 };
 extern crate home;
+use home::home_dir;
 
 use std::env;
 use std::thread;
@@ -27,6 +30,7 @@ fn main() {
 
     let mut help_arg: bool = false;
     let mut list_arg: bool = false;
+    let mut init_arg: bool = false;
     let mut speed_arg = String::new();
     let mut tank_arg = String::new();
     let mut fish_args: Vec<String> = Vec::new();
@@ -37,6 +41,8 @@ fn main() {
     while let Some(arg) = args_iter.next() {
         if arg.eq("-h") {
             help_arg = true;
+        } else if arg.eq("-i") {
+            init_arg = true;
         } else if arg.eq("-l") {
             list_arg = true;
         } else if arg.eq("-s") {
@@ -77,6 +83,15 @@ fn main() {
     
     if help_arg {
         println!("Help text");
+        std::process::exit(0);
+    }
+
+    if init_arg {
+        let freefish_dir = home::home_dir().unwrap().join(".config").join("freefish");
+        std::fs::create_dir_all(freefish_dir.clone());
+        std::fs::create_dir(freefish_dir.join("fish"));
+        std::fs::create_dir(freefish_dir.join("tanks"));
+        std::fs::create_dir(freefish_dir.join("ducks"));
         std::process::exit(0);
     }
 
