@@ -36,6 +36,11 @@ fn main() {
     let mut fish_args: Vec<String> = Vec::new();
     let mut duck_args: Vec<String> = Vec::new();
     
+    let freefish_dir = home::home_dir().unwrap().join(".config").join("freefish");
+    let fish_dir = freefish_dir.join("fish");
+    let tanks_dir = freefish_dir.join("tanks");
+    let ducks_dir = freefish_dir.join("ducks");
+    
     let mut args_iter = args.iter().skip(1);
 
     while let Some(arg) = args_iter.next() {
@@ -87,22 +92,22 @@ fn main() {
     }
 
     if init_arg {
-        let freefish_dir = home::home_dir().unwrap().join(".config").join("freefish");
-        std::fs::create_dir_all(freefish_dir.clone());
-        std::fs::create_dir(freefish_dir.join("fish"));
-        std::fs::create_dir(freefish_dir.join("tanks"));
-        std::fs::create_dir(freefish_dir.join("ducks"));
+        if let Err(e) = std::fs::create_dir_all(freefish_dir.clone()) { panic!("{}", e)};
+        if let Err(e) = std::fs::create_dir(fish_dir) { panic!("{}", e) };
+        if let Err(e) = std::fs::create_dir(tanks_dir) { panic!("{}", e) };
+        if let Err(e) = std::fs::create_dir(ducks_dir) { panic!("{}", e) };
         std::process::exit(0);
     }
 
-    let mut tank: Tank = Tank::new(&tank_arg);
+    let mut tank: Tank = Tank::new(&tanks_dir, &tank_arg);
     let mut fishies: Vec<Fish> = Vec::new();
     let mut duckies: Vec<Duck> = Vec::new();
+
     for arg in fish_args {
-        fishies.push(Fish::new(&arg, &tank));
+        fishies.push(Fish::new(&fish_dir, &arg, &tank));
     }
     for arg in duck_args {
-        duckies.push(Duck::new(&arg, &tank));
+        duckies.push(Duck::new(&ducks_dir, &arg, &tank));
     }
     
     if let Err(e) = io::stdout().execute(Hide) { panic!("{}", e); }

@@ -3,6 +3,7 @@ use self::rand::Rng;
 use std::fs::File;
 extern crate serde_json;
 use self::serde_json::*;
+use std::path::PathBuf;
 use load_file::*;
 use tank::*;
 use load_file::*;
@@ -23,7 +24,7 @@ pub struct Duck {
 }
 
 impl Duck {
-    pub fn new(name: &str, tank: &Tank) -> Self {
+    pub fn new(path: &PathBuf, name: &str, tank: &Tank) -> Self {
         let duck_file = File::open(format!("{}.json", name))
             .expect(&format!("{}.json should open", name));
         let duck_json: serde_json::Value = serde_json::from_reader(duck_file)

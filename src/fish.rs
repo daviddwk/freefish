@@ -2,6 +2,7 @@ extern crate rand;
 use self::rand::Rng;
 use std::fs::File;
 extern crate serde_json;
+use std::path::PathBuf;
 use self::serde_json::*;
 use load_file::*;
 use tank::*;
@@ -21,8 +22,8 @@ pub struct Fish {
 }
 
 impl Fish {
-    pub fn new(name: &str, tank: &Tank) -> Self {
-        let fish_file = File::open(format!("{}.json", name))
+    pub fn new(path: &PathBuf, name: &str, tank: &Tank) -> Self {
+        let fish_file = File::open(path.join(format!("{}.json", name)))
             .expect(&format!("{}.json should open", name));
         let fish_json: serde_json::Value = serde_json::from_reader(fish_file)
             .expect(&format!("{}.json should be JSON", name));

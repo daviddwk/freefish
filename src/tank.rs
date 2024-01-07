@@ -1,6 +1,7 @@
 use load_file::*;
 use color_glyph::ColorGlyph;
 use home::*;
+use std::path::PathBuf;
 use std::fs::File;
 extern crate serde_json;
 use self::serde_json::*;
@@ -15,8 +16,8 @@ pub struct Tank {
     pub bg_anim: Vec<Vec<Vec<ColorGlyph>>>
 }
 impl Tank {
-    pub fn new(name: &str) -> Self {
-        let tank_file = File::open(format!("{}.json", name))
+    pub fn new(path: &PathBuf, name: &str) -> Self {
+        let tank_file = File::open(path.join(format!("{}.json", name)))
             .expect(&format!("{}.json should open", name));
         let tank_json: serde_json::Value = serde_json::from_reader(tank_file)
             .expect(&format!("{}.json should be JSON", name));
