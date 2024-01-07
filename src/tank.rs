@@ -25,6 +25,10 @@ impl Tank {
         
         let fg_anim = load_animation(&tank_json, &format!("tank {}", name), "/foreground");
         let bg_anim = load_animation(&tank_json, &format!("tank {}", name), "/background");
+
+        if fg_anim[0].len() != bg_anim[0].len() || fg_anim[0][0].len() != bg_anim[0][0].len() {
+            panic!("{} mismatich in foreground and background size", name);
+        }
         
         if tank_json["depth"].is_u64() {
             depth = usize::try_from(tank_json["depth"].as_u64().unwrap()).unwrap();
@@ -33,11 +37,11 @@ impl Tank {
         let mut rng = rand::thread_rng();
         return Self {
             size:     (fg_anim[0].len(), fg_anim[0][0].len()),
-            depth:    depth,
+            depth,
             fg_frame: rng.gen_range(0..fg_anim.len()),
             bg_frame: rng.gen_range(0..bg_anim.len()),
-            fg_anim:  fg_anim, 
-            bg_anim:  bg_anim
+            fg_anim, 
+            bg_anim,
         }
     }
     pub fn update(&mut self) {

@@ -13,12 +13,10 @@ pub struct Fish {
     pos: (usize, usize),
     dest: (usize, usize),
     size: (usize, usize),
-    wait: usize,
     flip: bool,
     frame: usize,
     fish_anim: Animation,
     flip_anim: Animation, 
-    idle_anim: Animation
 }
 
 impl Fish {
@@ -30,20 +28,12 @@ impl Fish {
         
         let fish_anim = load_animation(&fish_json, &format!("fish {}", name), "/animation");
         let flip_anim = load_animation(&fish_json, &format!("fish {}", name), "/flipped_animation");
-        let idle_anim: Animation;
-        if fish_json["idle_animation"].is_null() {
-            idle_anim = Vec::new(); 
-        } else {
-            idle_anim = load_animation(&fish_json, &format!("fish {}", name), "/idle_animation");
-        }
-        if fish_anim.len() != flip_anim.len() ||
-           fish_anim[0].len() != flip_anim[0].len() ||
-           fish_anim[0][0].len() != flip_anim[0][0].len()
-        {
-            panic!("{} mismatch fish and flip size", name);
-        }
+
         if fish_anim.len() != flip_anim.len(){
             panic!("{} mismatch fish and flip number of frames", name);
+        }
+        if fish_anim[0].len() != flip_anim[0].len() || fish_anim[0][0].len() != flip_anim[0][0].len() {
+            panic!("{} mismatch fish and flip size", name);
         }
 
         let mut rng = rand::thread_rng(); 
@@ -54,12 +44,10 @@ impl Fish {
             dest:       (rng.gen_range(0 + tank.depth..=tank.size.0 - size.0),
                          rng.gen_range(0..=tank.size.1 - size.1)),
             size,       
-            wait:       0,
             flip:       rng.gen::<bool>(),
             frame:      rng.gen_range(0..fish_anim.len()),
             fish_anim,
             flip_anim, 
-            idle_anim, 
         }
     }
     pub fn update(&mut self, tank: &Tank) {
@@ -67,36 +55,28 @@ impl Fish {
         if self.frame == self.fish_anim.len() {
             self.frame = 0;
         }
-        if self.wait == 0 {
-            if self.pos.0 < self.dest.0 {
-                self.pos.0 += 1;
-            } else if self.pos.0 > self.dest.0 {
-                self.pos.0 -= 1;
-            }
-            if self.pos.1 < self.dest.1 {
-                self.pos.1 += 1;
-                self.flip = false;
-            } else if self.pos.1 > self.dest.1 {
-                self.pos.1 -= 1;
-                self.flip = true;
-            }
-            if self.pos == self.dest {
-                let mut rng = rand::thread_rng();
-                self.dest = (rng.gen_range(0 + tank.depth..=tank.size.0 - self.size.0),
-                             rng.gen_range(0..=tank.size.1 - self.size.1));
-                self.wait = 5;
-            }
-        } else {
-            self.wait -= 1;
+        if self.pos.0 < self.dest.0 {
+            self.pos.0 += 1;
+        } else if self.pos.0 > self.dest.0 {
+            self.pos.0 -= 1;
+        }
+        if self.pos.1 < self.dest.1 {
+            self.pos.1 += 1;
+            self.flip = false;
+        } else if self.pos.1 > self.dest.1 {
+            self.pos.1 -= 1;
+            self.flip = true;
+        }
+        if self.pos == self.dest {
+            let mut rng = rand::thread_rng();
+            self.dest = (rng.gen_range(0 + tank.depth..=tank.size.0 - self.size.0),
+                         rng.gen_range(0..=tank.size.1 - self.size.1));
         }
     }
 
     pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<&ColorGlyph> {
         let glyph: Option<&ColorGlyph>;
-        if self.wait != 0 && self.idle_anim.len() != 0 {
-            glyph = glyph_from_animation(&self.idle_anim,
-                self.frame, row_idx, glyph_idx, self.pos);
-        } else if self.flip {
+        if self.flip {
             glyph = glyph_from_animation(&self.flip_anim,
                 self.frame, row_idx, glyph_idx, self.pos);
         } else {
@@ -108,17 +88,4 @@ impl Fish {
         }
         return glyph;        
     }
-    /*
-    fn max_animation_size(animations: Vec<&Vec<Vec<Vec<ColorGlyph>>>>) -> (usize, usize) {
-        let mut max_size = (0, 0);
-        for a in animations {
-            if a[0].len() > max_size.0{
-                max_size.0 = a[0].len();
-            }
-            if a[0][0].len() > 
-        }
-        return max_size;
-    }
-    */
 }
-
