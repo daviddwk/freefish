@@ -25,7 +25,7 @@ pub struct Duck {
 
 impl Duck {
     pub fn new(path: &PathBuf, name: &str, tank: &Tank) -> Self {
-        let duck_file = File::open(format!("{}.json", name))
+        let duck_file = File::open(path.join(format!("{}.json", name)))
             .expect(&format!("{}.json should open", name));
         let duck_json: serde_json::Value = serde_json::from_reader(duck_file)
             .expect(&format!("{}.json should be JSON", name));
@@ -37,20 +37,14 @@ impl Duck {
         if duck_json["depth"].is_u64() {
             bouyancy = usize::try_from(duck_json["depth"].as_u64().unwrap()).unwrap();
         }
-        
-        /* TODO: redo with better errors
 
-        if duck_anim.len() != flip_anim.len() ||
-           duck_anim[0].len() != flip_anim[0].len() ||
-           duck_anim[0][0].len() != flip_anim[0][0].len()
-        {
-            panic!("{}.json mismatch size of animation and flipped_animation", name);
-        }
         if duck_anim.len() != flip_anim.len(){
-            panic!("{}.json mismatch size of animation and flipped_animation", name);
             panic!("{} mismatch duck and flip number of frames", name);
         }
-        */
+        if duck_anim[0].len() != flip_anim[0].len() || duck_anim[0][0].len() != flip_anim[0][0].len() {
+            panic!("{} mismatch duck and flip size", name);
+        }
+        
         let mut rng = rand::thread_rng();
         return Self {
             pos:        (tank.depth - bouyancy, rng.gen_range(0..tank.size.1)),
