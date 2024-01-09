@@ -1,5 +1,5 @@
 use std::io::{self};
-use std::fs::{create_dir, create_dir_all};
+use std::fs::{create_dir, create_dir_all, read_dir, copy};
 use std::path::{PathBuf, Path};
 extern crate crossterm;
 extern crate rand;
@@ -93,9 +93,27 @@ fn main() {
 
     if init_arg {
         if let Err(e) = std::fs::create_dir_all(freefish_dir.clone()) { panic!("{}", e)};
-        if let Err(e) = std::fs::create_dir(fish_dir) { panic!("{}", e) };
-        if let Err(e) = std::fs::create_dir(tanks_dir) { panic!("{}", e) };
-        if let Err(e) = std::fs::create_dir(ducks_dir) { panic!("{}", e) };
+        for asset_dir in [&fish_dir, &tanks_dir, &ducks_dir] {
+            if !asset_dir.exists() {
+                if let Err(e) = std::fs::create_dir(asset_dir) { 
+                    panic!("{}", e);
+                }
+            }
+        }
+
+        let fish_files = std::fs::read_dir("./config/fish").unwrap();
+        let tank_files = std::fs::read_dir("./config/tanks").unwrap();
+        let duck_files = std::fs::read_dir("./config/ducks").unwrap();
+
+        for asset_files in [(fish_files, &fish_dir), (tank_files, &tanks_dir), (duck_files, &ducks_dir)] {
+            for file in asset_files.0 {
+                match file {
+                    Err(e) => panic!("{}", e),
+                    Ok(f) => std::fs::copy(&f.path(), asset_files.1.join(f.file_name())),
+                };
+            }
+        }
+
         std::process::exit(0);
     }
 

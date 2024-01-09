@@ -1,0 +1,38 @@
+{
+    "animation": 
+    {
+        "symbols": 
+        [
+            ["><v>"],
+            ["><v>"]
+        ],
+        "colors": 
+        [
+            ["mmmm"],
+            ["mmrm"]
+        ],
+        "highlights": 
+        [
+            ["mmmm"],
+            ["mmrm"]
+        ]
+    },
+    "flipped_animation": 
+    {
+        "symbols": 
+        [
+            ["<v><"],
+            ["<^><"]
+        ],
+        "colors": 
+        [
+            ["mmmm"],
+            ["mrmm"]
+        ],
+        "highlights":
+        [
+            ["    "],
+            ["    "]
+        ]
+    }
+}
