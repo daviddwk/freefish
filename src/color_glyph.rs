@@ -12,13 +12,13 @@ pub struct ColorGlyph {
 
 impl ColorGlyph {
     pub fn print(&self) {
-        if let Err(e) = stdout().execute(SetForegroundColor(Color::Reset)) { panic!("{}", e); }
-        if let Err(e) = stdout().execute(SetBackgroundColor(Color::Reset)) { panic!("{}", e); }
+        stdout().execute(SetForegroundColor(Color::Reset)).unwrap();
+        stdout().execute(SetBackgroundColor(Color::Reset)).unwrap();
         if let Some(fg) = self.foreground_color  {
-            if let Err(e) = stdout().execute(SetForegroundColor(fg)) { panic!("{}", e); }
+            stdout().execute(SetForegroundColor(fg)).unwrap();
         }
         if let Some(bg) = self.background_color {
-            if let Err(e) = stdout().execute(SetBackgroundColor(bg)) { panic!("{}", e); }
+            stdout().execute(SetBackgroundColor(bg)).unwrap();
         }
         print!("{}", self.glyph);
     }

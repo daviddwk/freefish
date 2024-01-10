@@ -117,12 +117,10 @@ fn main() {
     }
 
     if init_arg {
-        if let Err(e) = create_dir_all(freefish_dir.clone()) { panic!("{}", e)};
+        create_dir_all(freefish_dir.clone()).unwrap();
         for asset_dir in [&fish_dir, &tanks_dir, &ducks_dir] {
             if !asset_dir.exists() {
-                if let Err(e) = create_dir(asset_dir) { 
-                    panic!("{}", e);
-                }
+                create_dir(asset_dir).unwrap();
             }
         }
 
@@ -134,10 +132,7 @@ fn main() {
             for file in asset_files.0 {
                 match file {
                     Err(e) => panic!("{}", e),
-                    Ok(f) => 
-                        if let Err(e) = copy(&f.path(), asset_files.1.join(f.file_name())) { 
-                            panic!("{}", e)
-                        },
+                    Ok(f) => copy(&f.path(), asset_files.1.join(f.file_name())).unwrap(),
                 };
             }
         }
@@ -164,7 +159,8 @@ fn main() {
         }
         exit(0);
     }
-
+    
+    if tank_arg.is_empty() { panic!("No tank was selected"); }
     let mut tank: Tank = Tank::new(&tanks_dir, &tank_arg);
     let mut fishies: Vec<Fish> = Vec::new();
     let mut duckies: Vec<Duck> = Vec::new();
@@ -178,10 +174,10 @@ fn main() {
     
     enable_raw_mode().unwrap();
 
-    if let Err(e) = stdout().execute(Hide) { panic!("{}", e); }
-    if let Err(e) = stdout().execute(Clear(crossterm::terminal::ClearType::All)) { panic!("{}", e); }
+    stdout().execute(Hide).unwrap();
+    stdout().execute(Clear(crossterm::terminal::ClearType::All)).unwrap();
     'render_loop: loop {
-        if let Err(e) = stdout().execute(MoveTo(0, 0)) { panic!("{}", e); }
+        stdout().execute(MoveTo(0, 0)).unwrap();
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
                 let mut printed = false;
