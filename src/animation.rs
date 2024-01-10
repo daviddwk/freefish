@@ -129,19 +129,6 @@ fn match_color(color: char) -> Option<Color> {
     }
 }
 
-pub fn size_animation(anim: Animation) -> (usize, usize) {
-    let mut size = (0, 0);
-    for frame in anim {
-        if size.0 > frame.len() {
-            size.0 = frame.len();
-        };
-        if size.1 > frame.len() {
-            size.1 = frame.len(); 
-        }
-    }
-    return size;
-}
-
 pub fn glyph_from_animation(anim: &Vec<Vec<Vec<ColorGlyph>>>, frame_idx: usize, row_idx: usize, glyph_idx: usize, position: (usize, usize)) -> Option<&ColorGlyph> {
     let frame_idx_oob = frame_idx >= anim.len();
     if frame_idx_oob {
