@@ -26,22 +26,18 @@ A free fish tank for your terminal! An improved and expanded version of freefish
 
 # Installation
 * Clone this repository
-
 ```
-git clone https://github.com/daviddwk/freefish.git
-cd freefish
+$ git clone https://github.com/daviddwk/freefish.git
+$ cd freefish
 ```
-
 * Use cargo to build freefish
-
 ```
-cargo build
+$ cargo build
 ```
 * Initialize freefish 
 run the binary with the init from from the cloned directory
-
 ```
-./target/debug/freefish -i
+$ ./target/debug/freefish -i
 ```
 this creates the following folders, and populated them with the assents provided in the config folder
 - ~/.config/tanks
@@ -50,51 +46,87 @@ this creates the following folders, and populated them with the assents provided
 
 * Test that freefish was initialized properly by using the list argument, which lists available assets
 ```
-./target/debug/freefish -l
+$ ./target/debug/freefish -l
 ```
-# Usage
+the following should be listed if freefish was initialized properly, possibly with even more assets
+```
+fish
+ guppy.json
+ angel.json
+ clown.json
+tanks
+ box.json
+ aquarium.json
+ducks
+ duck.json
+```
 
+# Usage
 Freefish is used by specifiying a tank and filling it with various fish and ducks. This is done by using the corresponding tank, fish, and duck flags and specifiying available assets to be used. Available assets can be listed by using the -l flag when running freefish.
 ```
-./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
+$ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
 ```
 
 ## Tank
-A single tank needs to be specified for freefish to display. This is done with the -t flag, following which a single argument should be suplied being the name of the desired tank. This tank may then be populated with fish and ducks.
-
-A dank also has a depth attribute that describes how deep the water level is for said tank. If this field is left bland then then the whole tank may be occupied by swimming fish. 
-
+A tank is specified with the -t flag followed by the name of a single tank. Available tanks can be listed using -l.
+```
+-t <tank>
+```
 Tank asset files should be stored in ~/.config/tanks with the .json extention. They can then be utilzed using their name, excluding the .json extintion. These files should contain the following keys.
 
-- depth (defaults to 0)
-- foreground (see Animation)
-    - symbols
-    - colors
-    - highlights
-- background (see Animation)
-    - symbols
-    - colors
-    - highlights
+- "depth" (defaults to 0)
+- "foreground" (see Animation)
+    - "symbols"
+    - "colors"
+    - "highlights"
+- "background" (see Animation)
+    - "symbols"
+    - "colors"
+    - "highlights"
 
 ### depth
+The depth key corresponds to a natural number that specifies the depth of the water. If this key is excluded the depth defalts to zero, placing the surface of the water at the top of the tank and allowing fish to swim anywhere. If a positive value, n, is specified than the surface of the water will be placed n lines down, leaving n lines of air at the top of the tank where fish cannot swim. Ducks swim at the surface of the water, so it is important to give them space where their heads peak above the water.
 
 ### foreground & background
-
 The foreground and background should both be animations of the same size, but they NEED NOT have the same numbers of frames. 
 
 ## Fish
-A tank may be populated by fish that will swim around the available area. Using the -f flag, one should follow this flag with the desired fish to populate the tank. An argument for the same fish may be supplied multiple times to add multiple of that fish. Those fish listed first will be rendered in front of those listed later.
+
+Fish are added to the tank using the -f flag followed by any number of fish to be added. The name of a fish may be used multiple times to add multiple of that fish to the tank. Those fish listed first will be rendered in front of those listed later. This flag is optional, but who wants a tank with no fish?
+```
+-f <fish_0> ... <fish_n>
+```
 
 ## Ducks
-Adding ducks to the tank works similarly as fish. Using the -d flag, one can supply a number of ducks to the tank. These ducks will swim back and forth across the top of the water level, specificed by the tank's depth flag.
+Adding ducks to the tank works similarly as fish, using the -d flag followed by any number of ducks. These ducks will swim back and forth across the top of the water level, specificed by the tank's depth flag.
+```
+-d <duck_0> ... <duck_n>
+```
+Duck asset files should be stored as json files in ~/.config/ducks, where than can then be specified using their name excluding the .json extention. These files should contain the following keys.
+
+- "buoyancy" (defaults to 0)
+- "animation" (see Animation)
+    - "symbols"
+    - "colors"
+    - "highligts"
+- "flipped_animation" (see Animation)
+    - "symbols"
+    - "colors"
+    - "highlights"
+
+### buoyancy
+
+The buoyancy key corresponds to a natural number that specifies the number of lines of the duck that should appear above the surface of the water. If this key is not specified it defaults to 0, where the top of the duck will be at the top layer of water. 
+
+### animation & flipped animation
 
 # Animations
 Each sort of asset (tanks fish, and ducks) comtains animations in their json file, which consists of a name and the following subkeys.
 
-- animation
-    - symbols
-    - colors
-    - highlights
+- animation_name
+    - "symbols"
+    - "colors"
+    - "highlights"
 
 Each of the subkeys should contain a list of frames, which is expressed as a list of list of strings. Each frame must be the same size, thus contaning the same number of strings where each string is the same length.
 
