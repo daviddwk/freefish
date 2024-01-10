@@ -38,11 +38,11 @@ extern crate rand;
 extern crate home;
 
 mod tank;
-use tank::*;
+use tank::Tank;
 mod fish;
-use fish::*;
+use fish::Fish;
 mod duck;
-use duck::*;
+use duck::Duck;
 mod animation;
 mod color_glyph;
 
