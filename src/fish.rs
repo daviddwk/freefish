@@ -1,13 +1,13 @@
+use std::fs::File;
+use std::path::PathBuf;
+
+extern crate serde_json;
 extern crate rand;
 use self::rand::Rng;
-use std::fs::File;
-extern crate serde_json;
-use std::path::PathBuf;
-use self::serde_json::*;
-use load_file::*;
-use tank::*;
-use load_file::*;
-use color_glyph::*;
+
+use tank::Tank;
+use animation::{Animation, load_animation, glyph_from_animation};
+use color_glyph::ColorGlyph;
 
 pub struct Fish {
     pos: (usize, usize),

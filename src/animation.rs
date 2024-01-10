@@ -1,14 +1,11 @@
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
-use color_glyph::*;
-use crossterm::style::Color;
 extern crate serde_json;
-use self::serde_json::*;
+use crossterm::style::Color;
+
+use color_glyph::ColorGlyph;
 
 pub type Animation = Vec<Vec<Vec<ColorGlyph>>>;
 
-pub fn load_animation(json: &Value, name: &str, anim_key: &str) -> Animation {
+pub fn load_animation(json: &serde_json::Value, name: &str, anim_key: &str) -> Animation {
     let mut out_anim: Animation = Vec::new();
     let symbols = json.pointer(&format!("{}/symbols", anim_key))
         .expect(&format!("{} should have symbols key", anim_key));
@@ -75,7 +72,7 @@ pub fn load_animation(json: &Value, name: &str, anim_key: &str) -> Animation {
     return out_anim;
 }
 
-fn check_format(json_array: &Value, name: &str) {
+fn check_format(json_array: &serde_json::Value, name: &str) {
     if !json_array.is_array() { 
         panic!("{} is not an array", name);
     }
@@ -90,7 +87,7 @@ fn check_format(json_array: &Value, name: &str) {
     }
 }
 
-fn check_array(json_array: &Value, target_size: usize, name: &str) {
+fn check_array(json_array: &serde_json::Value, target_size: usize, name: &str) {
     if !json_array.is_array() { 
         panic!("{} is not an array", name); 
     }
@@ -99,7 +96,7 @@ fn check_array(json_array: &Value, target_size: usize, name: &str) {
     }
 }
 
-fn check_string(json_string: &Value, target_size: usize, name: &str) {
+fn check_string(json_string: &serde_json::Value, target_size: usize, name: &str) {
     if !json_string.is_string() { 
         panic!("{} is not a string", name); 
     }

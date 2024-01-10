@@ -1,14 +1,13 @@
-extern crate rand;
-use self::rand::Rng;
 use std::fs::File;
-extern crate serde_json;
-use self::serde_json::*;
 use std::path::PathBuf;
-use load_file::*;
-use tank::*;
-use load_file::*;
-use color_glyph::*;
 use std::convert::TryFrom;
+
+extern crate serde_json;
+use rand::Rng;
+
+use tank::Tank;
+use animation::{Animation, load_animation};
+use color_glyph::*;
 
 pub struct Duck {
     pos: (usize, usize),
@@ -19,8 +18,8 @@ pub struct Duck {
     tank_size: (usize, usize),
     flip: bool,
     frame: usize,
-    duck_anim: Vec<Vec<Vec<ColorGlyph>>>,
-    flip_anim: Vec<Vec<Vec<ColorGlyph>>>,
+    duck_anim: Animation,
+    flip_anim: Animation,
 }
 
 impl Duck {

@@ -1,19 +1,19 @@
-use load_file::*;
-use color_glyph::ColorGlyph;
-use home::*;
-use std::path::PathBuf;
 use std::fs::File;
-extern crate serde_json;
-use self::serde_json::*;
-use rand::Rng;
+use std::path::PathBuf;
 use std::convert::TryFrom;
+
+extern crate serde_json;
+use rand::Rng;
+
+use animation::{Animation, load_animation};
+
 pub struct Tank {
     pub size: (usize, usize),
     pub depth: usize,
     pub fg_frame: usize,
     pub bg_frame: usize,
-    pub fg_anim: Vec<Vec<Vec<ColorGlyph>>>,
-    pub bg_anim: Vec<Vec<Vec<ColorGlyph>>>
+    pub fg_anim: Animation,
+    pub bg_anim: Animation
 }
 impl Tank {
     pub fn new(path: &PathBuf, name: &str) -> Self {

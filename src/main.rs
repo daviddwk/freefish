@@ -1,32 +1,24 @@
-use std::io::{self};
-use std::fs::{create_dir, create_dir_all, read_dir, copy};
-use std::path::{PathBuf, Path};
 extern crate crossterm;
-extern crate rand;
 use crossterm::{
     ExecutableCommand,
     cursor::{Hide, MoveTo},
     terminal::Clear,
 };
+extern crate rand;
 extern crate home;
-use home::home_dir;
 
-use std::env;
-use std::thread;
-use std::time;use::color_glyph::*;
-
-mod fish;
 mod tank;
-mod load_file;
-mod color_glyph;
-mod duck;
-
-use fish::*;
-use duck::*;
 use tank::*;
+mod fish;
+use fish::*;
+mod duck;
+use duck::*;
+mod animation;
+mod color_glyph;
+
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let args: Vec<String> = std::env::args().collect();
 
     let mut help_arg: bool = false;
     let mut list_arg: bool = false;
@@ -128,10 +120,10 @@ fn main() {
         duckies.push(Duck::new(&ducks_dir, &arg, &tank));
     }
     
-    if let Err(e) = io::stdout().execute(Hide) { panic!("{}", e); }
-    if let Err(e) = io::stdout().execute(Clear(crossterm::terminal::ClearType::All)) { panic!("{}", e); }
+    if let Err(e) = std::io::stdout().execute(Hide) { panic!("{}", e); }
+    if let Err(e) = std::io::stdout().execute(Clear(crossterm::terminal::ClearType::All)) { panic!("{}", e); }
     loop {
-        if let Err(e) = io::stdout().execute(MoveTo(0, 0)) { panic!("{}", e); }
+        if let Err(e) = std::io::stdout().execute(MoveTo(0, 0)) { panic!("{}", e); }
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
                 let mut printed = false;
@@ -171,6 +163,6 @@ fn main() {
             duckies[duck_idx].update();
         }
         tank.update();
-        thread::sleep(time::Duration::from_millis(200));
+        std::thread::sleep(std::time::Duration::from_millis(200));
     }
 }
