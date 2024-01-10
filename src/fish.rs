@@ -38,11 +38,15 @@ impl Fish {
 
         let mut rng = rand::thread_rng(); 
         let size = (fish_anim[0].len(), fish_anim[0][0].len());
+        
+        if tank.size.0 <= size.0 + tank.depth || tank.size.1 <= size.1 {
+            panic!("{} too large for tank", name)
+        }
+        let pos_range = (0 + tank.depth..=tank.size.0 - size.0, 0..=tank.size.1 - size.1);
+
         return Self {
-            pos:        (rng.gen_range(0 + tank.depth..=tank.size.0 - size.0),
-                         rng.gen_range(0..=tank.size.1 - size.1)),
-            dest:       (rng.gen_range(0 + tank.depth..=tank.size.0 - size.0),
-                         rng.gen_range(0..=tank.size.1 - size.1)),
+            pos:        (rng.gen_range(pos_range.0.clone()), rng.gen_range(pos_range.1.clone())),
+            dest:       (rng.gen_range(pos_range.0.clone()), rng.gen_range(pos_range.1.clone())),
             size,       
             flip:       rng.gen::<bool>(),
             frame:      rng.gen_range(0..fish_anim.len()),
