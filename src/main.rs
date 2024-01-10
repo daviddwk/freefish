@@ -1,3 +1,4 @@
+use std::ffi::OsStr;
 extern crate crossterm;
 use crossterm::{
     ExecutableCommand,
@@ -109,6 +110,27 @@ fn main() {
             }
         }
 
+        std::process::exit(0);
+    }
+
+    if list_arg {
+        let fish_files = std::fs::read_dir("./config/fish").unwrap();
+        let tank_files = std::fs::read_dir("./config/tanks").unwrap();
+        let duck_files = std::fs::read_dir("./config/ducks").unwrap();
+
+        for asset_files in [(fish_files, "fish"), (tank_files, "tanks"), (duck_files, "ducks")] {
+            println!("{}", asset_files.1);
+            for file in asset_files.0 {
+                match file {
+                    Err(e) => panic!("{}", e),
+                    Ok(f) =>
+                        if f.path().extension() == Some(OsStr::new("json")) {
+                            // should use file_prefix instead of file_name, but is experimental
+                            println!("{}", f.path().file_name().unwrap().to_str().unwrap()); 
+                        },
+                };
+            }
+        }
         std::process::exit(0);
     }
 
