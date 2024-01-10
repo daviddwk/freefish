@@ -213,72 +213,118 @@ Both the colors and highlihts sections contain charcters that will translate to 
     {
         "symbols": 
         [
-            [
-                "  n ",
-                "><v>"
-            ],
-            [
-                "  n ",
-                "><^>"
-            ]
+            ["  n ",
+             "><v>"],
+
+            ["  n ",
+             "><^>"]
         ],
         "colors": 
         [
-            [
-                "  n ",
-                "mmrm"
-            ],
-            [
-                "  n ",
-                "mmrm"
-            ]
+            ["  n ",
+             "mmrm"],
+
+            ["  n ",
+             "mmrm"]
         ],
         "highlights": 
         [
-            [
-                "    ",
-                "    "
-            ],
-            [
-                "    ",
-                "    "
-            ]
+            ["    ",
+             "    "],
+
+            ["    ",
+             "    "]
         ]
     },
     "flipped_animation": 
     {
         "symbols": 
         [
-            [
-                " n  ",
-                "<v><"
-            ],
-            [
-                " n  ",
-                "<^><"
-            ]
+            [" n  ",
+             "<v><"],
+
+            [" n  ",
+             "<^><"]
         ],
         "colors": 
         [
-            [
-                " m  ",
-                "mrmm"
-            ],
-            [
-                " m  ",
-                "mrmm"
-            ]
+            [" m  ",
+             "mrmm"],
+
+            [" m  ",
+             "mrmm"]
         ],
         "highlights": 
         [
-            [
-                "    ",
-                "    "
-            ],
-            [
-                "    ",
-                "    "
-            ]
+            ["    ",
+             "    "],
+
+            ["    ",
+             "    "]
+        ]
+    }
+}
+```
+## duck
+```
+{
+    "buoyancy": 1,      <--- one row of the duck above water level
+    "animation": {
+        "symbols": [
+            ["  ()-",
+             "<.v) ",   <--- water level here
+             " ^^  "],
+
+            ["  ()<",
+             "<.v) ",
+             " ^^  "]
+        ],
+        "colors": [
+            ["  wwy",
+             "wwww ",
+             " yy  "],
+
+            ["  wwy",
+             "wwww ",
+             " yy  "]
+        ],
+        "highlights": [
+            ["     ",
+             "     ",
+             "     "],
+
+            ["     ",
+             "     ",
+             "     "]
+        ]
+    },
+    "flipped_animation": {
+        "symbols": [
+            [">()  ",
+             " (v.>",   <--- water level here
+             "  ^^ "],
+
+            ["-()  ",
+             " (v.>",
+             "  ^^ "]
+        ],
+        "colors": [
+            ["yww  ",
+             " wwww",
+             "  yy "],
+
+            ["yww  ",
+             " wwww",
+             "  yy "]
+        ],
+        "highlights": [
+            ["     ",
+             "     ",
+             "     "],
+
+            ["     ",
+             "     ",
+             "     "]
         ]
     }
 }
