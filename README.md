@@ -67,13 +67,22 @@ Freefish is used by specifiying a tank and filling it with various fish and duck
 $ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
 ```
 
+## Initializing
+
+Initializing freefish using -i creates the following directories, and copies the provided assets from ./config if available. That is why this command should be run from the cloned directory.
+```
+~/.config/freefish/tanks
+~/.config/freefish/fish
+~/.config/freefish/ducks
+```
+
 ## Quitting
 
 freefish can be stopped by pressing the q or Esc keys
 
 ## List
 
-Available assets are listed using the -l flag. These assets can be used to selet and populate your own fish. When specifiying assets (tanks, fish, ducks) one should use the name of the asset excluding the .json extention.
+Avilable assets, json files placed into the corresponding subdirectories of ~/.config/freefsh/, are listed using the -l flag. These assets can be used to select and populate your own fish tank. When specifiying assets (tanks, fish, ducks) one should use the name of the asset excluding the .json extention.
 ```
 -l
 ```
@@ -114,13 +123,30 @@ Fish are added to the tank using the -f flag followed by any number of fish to b
 ```
 -f <fish_0> ... <fish_n>
 ```
+Duck asset files are json files stored in ~/.config/freefish/fish, which can be specficied by their file name excluding the .json extention. These files should contain the following key structure.
+- "animation" (see Animation)
+    - "symbols"
+    - "colors"
+    - "highligts"
+- "flipped_animation" (see Animation)
+    - "symbols"
+    - "colors"
+    - "highlights"
+### animation & flipped_animation
+
+The animation and flipped_animation animations should be of equal size and have the same number of frames.
+
+### example
+```
+
+```
 
 ## Ducks
 Adding ducks to the tank works similarly as fish, using the -d flag followed by any number of ducks. These ducks will swim back and forth across the top of the water level, specificed by the tank's depth flag.
 ```
 -d <duck_0> ... <duck_n>
 ```
-Duck asset files should be stored as json files in ~/.config/ducks, where than can then be specified using their name excluding the .json extention. These files should contain the following keys.
+Duck asset files should be stored as json files in ~/.config/freefsh/ducks, where than can then be specified using their name excluding the .json extention. These files should contain the following keys.
 
 - "buoyancy" (defaults to 0)
 - "animation" (see Animation)
@@ -138,6 +164,8 @@ The buoyancy key corresponds to a natural number that specifies the number of li
 
 ### animation & flipped animation
 
+The animation and flipped_animation animations should be of equal size and have the same number of frames.
+
 # Animations
 Each sort of asset (tanks fish, and ducks) comtains animations in their json file, which consists of a name and the following subkeys.
 
@@ -146,7 +174,7 @@ Each sort of asset (tanks fish, and ducks) comtains animations in their json fil
     - "colors"
     - "highlights"
 
-Each of the subkeys should contain a list of frames, which is expressed as a list of list of strings. Each frame must be the same size, thus contaning the same number of strings where each string is the same length.
+Each of the subkeys should contain a list of frames, where each frame is a list of strings, forming a matrix. Each frame must be rectangular and the same size as all other frames in the animation, thus each frame should have the same number of strings where each string is the same length.
 
 Frames are broken up into thee speerate parts, each expressed as an equal size matrix of characters. These parts, symbols, colors and highlihts, and explained below.
 
@@ -175,3 +203,83 @@ Both the colors and highlihts sections contain charcters that will translate to 
 - 'M' : DarkMagenta
 - 'C' : DarkCyan
 - 'W' : Grey
+
+# Examples
+
+## fish
+```
+{
+    "animation": 
+    {
+        "symbols": 
+        [
+            [
+                "  n ",
+                "><v>"
+            ],
+            [
+                "  n ",
+                "><^>"
+            ]
+        ],
+        "colors": 
+        [
+            [
+                "  n ",
+                "mmrm"
+            ],
+            [
+                "  n ",
+                "mmrm"
+            ]
+        ],
+        "highlights": 
+        [
+            [
+                "    ",
+                "    "
+            ],
+            [
+                "    ",
+                "    "
+            ]
+        ]
+    },
+    "flipped_animation": 
+    {
+        "symbols": 
+        [
+            [
+                " n  ",
+                "<v><"
+            ],
+            [
+                " n  ",
+                "<^><"
+            ]
+        ],
+        "colors": 
+        [
+            [
+                " m  ",
+                "mrmm"
+            ],
+            [
+                " m  ",
+                "mrmm"
+            ]
+        ],
+        "highlights": 
+        [
+            [
+                "    ",
+                "    "
+            ],
+            [
+                "    ",
+                "    "
+            ]
+        ]
+    }
+}
+```
