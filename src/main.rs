@@ -23,7 +23,7 @@ fn main() {
     let mut help_arg: bool = false;
     let mut list_arg: bool = false;
     let mut init_arg: bool = false;
-    let mut speed_arg = String::new();
+    let mut speed_arg: u64 = 200;
     let mut tank_arg = String::new();
     let mut fish_args: Vec<String> = Vec::new();
     let mut duck_args: Vec<String> = Vec::new();
@@ -47,7 +47,10 @@ fn main() {
             if let Some(arg) = tmp_args_iter.next() {
                 if arg.chars().next() != Some('-') {
                     args_iter.next();
-                    speed_arg = arg.clone();
+                    match arg.parse::<u64>() {
+                        Err(e) => panic!("Invalid speed argument\n{}", e),
+                        Ok(a) => speed_arg = a,
+                    }
                 }
             }
         } else if arg.eq("-t") {
@@ -163,6 +166,6 @@ fn main() {
             duckies[duck_idx].update();
         }
         tank.update();
-        std::thread::sleep(std::time::Duration::from_millis(200));
+        std::thread::sleep(std::time::Duration::from_millis(speed_arg));
     }
 }
