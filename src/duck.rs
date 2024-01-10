@@ -56,8 +56,8 @@ impl Duck {
             tank_depth: tank.depth,
             flip:       rng.gen::<bool>(),
             frame:      rng.gen_range(0..duck_anim.len()),
-            duck_anim:  duck_anim,
-            flip_anim:  flip_anim,
+            duck_anim,
+            flip_anim,
         }
     }
     pub fn update(&mut self) {
