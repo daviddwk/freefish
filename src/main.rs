@@ -208,7 +208,9 @@ fn main() {
                     tank.bg_anim[tank.bg_frame][row_idx][glyph_idx].print();
                 }
             }
-            print!("\r\n");
+            if row_idx != tank.size.0 - 1 {
+                print!("\r\n");
+            }
         }
         for fish_idx in 0..fishies.len() {
             fishies[fish_idx].update(&tank);
