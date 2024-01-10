@@ -1,7 +1,6 @@
 use std::env::args;
-use std::thread::sleep;
 use std::process::exit;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 use std::io::stdout;
 use std::ffi::OsStr;
 use std::fs::{
@@ -14,8 +13,26 @@ use std::fs::{
 extern crate crossterm;
 use crossterm::{
     ExecutableCommand,
-    cursor::{Hide, MoveTo},
-    terminal::Clear,
+    cursor::{
+        Hide, 
+        Show, 
+        MoveTo
+    },
+    terminal::{
+        Clear, 
+        disable_raw_mode, 
+        enable_raw_mode
+    },
+    event::{
+        Event, 
+        poll, 
+        read, 
+        KeyCode, 
+        KeyEvent, 
+        KeyModifiers, 
+        KeyEventKind, 
+        KeyEventState
+    },
 };
 extern crate rand;
 extern crate home;
@@ -89,7 +106,7 @@ fn main() {
                 duck_args.push(arg.clone()); 
             }
         } else {
-            println!("invalid argument {}", arg);
+            println!("invalid argument {}\ntry -h for help", arg);
             exit(1);
         }
     }
@@ -159,9 +176,11 @@ fn main() {
         duckies.push(Duck::new(&ducks_dir, &arg, &tank));
     }
     
+    enable_raw_mode().unwrap();
+
     if let Err(e) = stdout().execute(Hide) { panic!("{}", e); }
     if let Err(e) = stdout().execute(Clear(crossterm::terminal::ClearType::All)) { panic!("{}", e); }
-    loop {
+    'render_loop: loop {
         if let Err(e) = stdout().execute(MoveTo(0, 0)) { panic!("{}", e); }
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
@@ -193,7 +212,7 @@ fn main() {
                     tank.bg_anim[tank.bg_frame][row_idx][glyph_idx].print();
                 }
             }
-            print!("\n");
+            print!("\r\n");
         }
         for fish_idx in 0..fishies.len() {
             fishies[fish_idx].update(&tank);
@@ -202,6 +221,34 @@ fn main() {
             duckies[duck_idx].update();
         }
         tank.update();
-        sleep(Duration::from_millis(speed_arg));
+        
+        // there must be a better way
+        let frame_duration = Duration::from_millis(speed_arg);
+        let frame_start = SystemTime::now();
+        let mut now = SystemTime::now();
+        while now.duration_since(frame_start).unwrap() < frame_duration {
+            if poll(frame_duration - now.duration_since(frame_start).unwrap()).unwrap() {
+                match read().unwrap() {
+                    Event::Key(KeyEvent {
+                        code: KeyCode::Char('q'),
+                        modifiers: KeyModifiers::NONE,
+                        kind: KeyEventKind::Press,
+                        state: KeyEventState::NONE,
+                    }) => break 'render_loop,
+                    Event::Key(KeyEvent {
+                        code: KeyCode::Esc,
+                        modifiers: KeyModifiers::NONE,
+                        kind: KeyEventKind::Press,
+                        state: KeyEventState::NONE,
+                    }) => break 'render_loop,
+                    _ => (),
+                }
+            }
+            now = SystemTime::now();
+        }
     }
+    
+    stdout().execute(Show).unwrap();
+    disable_raw_mode().unwrap();
+    exit(0);
 }
