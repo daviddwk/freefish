@@ -1,4 +1,16 @@
+use std::env::args;
+use std::thread::sleep;
+use std::process::exit;
+use std::time::Duration;
+use std::io::stdout;
 use std::ffi::OsStr;
+use std::fs::{
+    create_dir, 
+    create_dir_all,
+    read_dir, 
+    copy
+};
+
 extern crate crossterm;
 use crossterm::{
     ExecutableCommand,
@@ -19,7 +31,7 @@ mod color_glyph;
 
 
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
+    let args: Vec<String> = args().collect();
 
     let mut help_arg: bool = false;
     let mut list_arg: bool = false;
@@ -78,45 +90,48 @@ fn main() {
             }
         } else {
             println!("invalid argument {}", arg);
-            std::process::exit(1);
+            exit(1);
         }
     }
     
     if help_arg {
         println!("Help text");
-        std::process::exit(0);
+        exit(0);
     }
 
     if init_arg {
-        if let Err(e) = std::fs::create_dir_all(freefish_dir.clone()) { panic!("{}", e)};
+        if let Err(e) = create_dir_all(freefish_dir.clone()) { panic!("{}", e)};
         for asset_dir in [&fish_dir, &tanks_dir, &ducks_dir] {
             if !asset_dir.exists() {
-                if let Err(e) = std::fs::create_dir(asset_dir) { 
+                if let Err(e) = create_dir(asset_dir) { 
                     panic!("{}", e);
                 }
             }
         }
 
-        let fish_files = std::fs::read_dir("./config/fish").unwrap();
-        let tank_files = std::fs::read_dir("./config/tanks").unwrap();
-        let duck_files = std::fs::read_dir("./config/ducks").unwrap();
+        let fish_files = read_dir("./config/fish").unwrap();
+        let tank_files = read_dir("./config/tanks").unwrap();
+        let duck_files = read_dir("./config/ducks").unwrap();
 
         for asset_files in [(fish_files, &fish_dir), (tank_files, &tanks_dir), (duck_files, &ducks_dir)] {
             for file in asset_files.0 {
                 match file {
                     Err(e) => panic!("{}", e),
-                    Ok(f) => std::fs::copy(&f.path(), asset_files.1.join(f.file_name())),
+                    Ok(f) => 
+                        if let Err(e) = copy(&f.path(), asset_files.1.join(f.file_name())) { 
+                            panic!("{}", e)
+                        },
                 };
             }
         }
 
-        std::process::exit(0);
+        exit(0);
     }
 
     if list_arg {
-        let fish_files = std::fs::read_dir("./config/fish").unwrap();
-        let tank_files = std::fs::read_dir("./config/tanks").unwrap();
-        let duck_files = std::fs::read_dir("./config/ducks").unwrap();
+        let fish_files = read_dir("./config/fish").unwrap();
+        let tank_files = read_dir("./config/tanks").unwrap();
+        let duck_files = read_dir("./config/ducks").unwrap();
 
         for asset_files in [(fish_files, "fish"), (tank_files, "tanks"), (duck_files, "ducks")] {
             println!("{}", asset_files.1);
@@ -131,7 +146,7 @@ fn main() {
                 };
             }
         }
-        std::process::exit(0);
+        exit(0);
     }
 
     let mut tank: Tank = Tank::new(&tanks_dir, &tank_arg);
@@ -145,10 +160,10 @@ fn main() {
         duckies.push(Duck::new(&ducks_dir, &arg, &tank));
     }
     
-    if let Err(e) = std::io::stdout().execute(Hide) { panic!("{}", e); }
-    if let Err(e) = std::io::stdout().execute(Clear(crossterm::terminal::ClearType::All)) { panic!("{}", e); }
+    if let Err(e) = stdout().execute(Hide) { panic!("{}", e); }
+    if let Err(e) = stdout().execute(Clear(crossterm::terminal::ClearType::All)) { panic!("{}", e); }
     loop {
-        if let Err(e) = std::io::stdout().execute(MoveTo(0, 0)) { panic!("{}", e); }
+        if let Err(e) = stdout().execute(MoveTo(0, 0)) { panic!("{}", e); }
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
                 let mut printed = false;
@@ -188,6 +203,6 @@ fn main() {
             duckies[duck_idx].update();
         }
         tank.update();
-        std::thread::sleep(std::time::Duration::from_millis(speed_arg));
+        sleep(Duration::from_millis(speed_arg));
     }
 }

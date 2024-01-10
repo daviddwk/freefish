@@ -1,3 +1,4 @@
+use std::io::stdout;
 use crossterm::{
     ExecutableCommand,
     style::{Color, SetForegroundColor, SetBackgroundColor}
@@ -11,13 +12,13 @@ pub struct ColorGlyph {
 
 impl ColorGlyph {
     pub fn print(&self) {
-        std::io::stdout().execute(SetForegroundColor(Color::Reset));
-        std::io::stdout().execute(SetBackgroundColor(Color::Reset));
+        if let Err(e) = stdout().execute(SetForegroundColor(Color::Reset)) { panic!("{}", e); }
+        if let Err(e) = stdout().execute(SetBackgroundColor(Color::Reset)) { panic!("{}", e); }
         if let Some(fg) = self.foreground_color  {
-            std::io::stdout().execute(SetForegroundColor(fg));
+            if let Err(e) = stdout().execute(SetForegroundColor(fg)) { panic!("{}", e); }
         }
         if let Some(bg) = self.background_color {
-            std::io::stdout().execute(SetBackgroundColor(bg));
+            if let Err(e) = stdout().execute(SetBackgroundColor(bg)) { panic!("{}", e); }
         }
         print!("{}", self.glyph);
     }
