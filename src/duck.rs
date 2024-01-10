@@ -13,7 +13,7 @@ pub struct Duck {
     pos: (usize, usize),
     dest: (usize, usize),
     size: (usize, usize),
-    bouyancy: usize,
+    buoyancy: usize,
     tank_depth: usize,
     tank_size: (usize, usize),
     flip: bool,
@@ -32,9 +32,9 @@ impl Duck {
         let duck_anim = load_animation(&duck_json, &format!("tank {}", name), "/animation");
         let flip_anim = load_animation(&duck_json, &format!("tank {}", name), "/flipped_animation");
 
-        let mut bouyancy: usize = 0;
-        if duck_json["depth"].is_u64() {
-            bouyancy = usize::try_from(duck_json["depth"].as_u64().unwrap()).unwrap();
+        let mut buoyancy: usize = 0;
+        if duck_json["buoyancy"].is_u64() {
+            buoyancy = usize::try_from(duck_json["buoyancy"].as_u64().unwrap()).unwrap();
         }
 
         if duck_anim.len() != flip_anim.len(){
@@ -43,13 +43,15 @@ impl Duck {
         if duck_anim[0].len() != flip_anim[0].len() || duck_anim[0][0].len() != flip_anim[0][0].len() {
             panic!("{} mismatch duck and flip size", name);
         }
-        
+        if tank.depth < buoyancy {
+            panic!("{} does not fit on tank\ntry adjusting the tank's depth or the duck's buoyancy", name);
+        }
         let mut rng = rand::thread_rng();
         return Self {
-            pos:        (tank.depth - bouyancy, rng.gen_range(0..tank.size.1)),
-            dest:       (tank.depth - bouyancy, rng.gen_range(0..tank.size.1)),
+            pos:        (tank.depth - buoyancy, rng.gen_range(0..tank.size.1)),
+            dest:       (tank.depth - buoyancy, rng.gen_range(0..tank.size.1)),
             size:       (duck_anim[0].len(), duck_anim[0][0].len()),
-            bouyancy:   bouyancy,
+            buoyancy,
             tank_size:  tank.size,
             tank_depth: tank.depth,
             flip:       rng.gen::<bool>(),
@@ -78,7 +80,7 @@ impl Duck {
         if self.pos == self.dest {
             let mut rng = rand::thread_rng();
             self.dest = (
-                self.tank_depth - self.bouyancy, 
+                self.tank_depth - self.buoyancy, 
                 rng.gen_range(0..self.tank_size.1)
             );
         }
