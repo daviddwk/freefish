@@ -4,7 +4,7 @@
         "symbols": 
         [
             ["><v>"],
-            ["><v>"]
+            ["><^>"]
         ],
         "colors": 
         [
@@ -13,8 +13,8 @@
         ],
         "highlights": 
         [
-            ["mmmm"],
-            ["mmrm"]
+            ["    "],
+            ["    "]
         ]
     },
     "flipped_animation": 

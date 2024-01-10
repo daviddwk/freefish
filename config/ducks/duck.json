@@ -9,24 +9,22 @@
              "<.v) ",
              " ^^  "]
         ],
-        "colors": {
-            "foreground": [
-                ["  wwy",
-                 "wwww ",
-                 " yy  "],
-                ["  wwy",
-                 "wwww ",
-                 " yy  "]
-            ],
-            "background": [
-                ["     ",
-                 "     ",
-                 "     "],
-                ["     ",
-                 "     ",
-                 "     "]
-            ]
-        }
+        "colors": [
+            ["  wwy",
+             "wwww ",
+             " yy  "],
+            ["  wwy",
+             "wwww ",
+             " yy  "]
+        ],
+        "highlights": [
+            ["     ",
+             "     ",
+             "     "],
+            ["     ",
+             "     ",
+             "     "]
+        ]
     },
     "flipped_animation": {
         "symbols": [
@@ -37,22 +35,21 @@
              " (v.>",
              "  ^^ "]
         ],
-        "colors": {
-            "foreground": [
-                ["yww  ",
-                 " wwww",
-                 "  yy "],
-                ["yww  ",
-                 " wwww",
-                 "  yy "]
-            ],
-            "background": [
-                ["     ",
-                 "     "],
-                ["     ",
-                 "     ",
-                 "     "]
-            ]
-        }
+        "colors": [
+            ["yww  ",
+             " wwww",
+             "  yy "],
+            ["yww  ",
+             " wwww",
+             "  yy "]
+        ],
+        "highlights": [
+            ["     ",
+             "     ",
+             "     "],
+            ["     ",
+             "     ",
+             "     "]
+        ]
     }
 }
