@@ -67,6 +67,24 @@ Freefish is used by specifiying a tank and filling it with various fish and duck
 $ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
 ```
 
+## Quitting
+
+freefish can be stopped by pressing the q or Esc keys
+
+## List
+
+Available assets are listed using the -l flag. These assets can be used to selet and populate your own fish. When specifiying assets (tanks, fish, ducks) one should use the name of the asset excluding the .json extention.
+```
+-l
+```
+
+## Speed
+
+The delay between frames can be modified using the -s flag. Following this flag the derired delay between frames is specified in ms.
+```
+-s <delay_ms>
+```
+
 ## Tank
 A tank is specified with the -t flag followed by the name of a single tank. Available tanks can be listed using -l.
 ```
