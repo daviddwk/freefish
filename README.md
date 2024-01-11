@@ -379,7 +379,7 @@ Both the colors and highlihts sections contain charcters that will translate to 
             [
                 "@--------@",
                 "|        |",
-                "|^^^^^^^^|",   <--- water level here
+                "|^^^^^^^^|",   <--- top row where fish can swim
                 "|        |",
                 "|        |",
                 "|        |",
