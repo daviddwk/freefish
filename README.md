@@ -1,28 +1,7 @@
 # rustyfish
 A fish tank for your terminal that can be easily customized by creating new animated tanks, fish, and ducks. These assets are supplied as properly formatted `.json` files. This format makes creating colored frames of ASCII art simple.
 
-```
-:                                                                             :
-:                                                                             :
-:                 ()<                                                         :
-:~    ~~~  ~ ~~0<.v)  ~~~~~~    ~~~    ~~   ~~~~~   ~~  ~~~~     ~~~~  ~  ~~~~:
-:  ~~  o  `   00 ^^   ~~~~       ~~       `~`      ~~      ~~~~        ~~~`   :
-:  o  o00~<vo<  0  `                 ~~~    ``                     ~~         :
-:          o0 o 0,_ _" `     /          //'                                   :
-:     o0    0   <_<)\,><}   `\    /    /.\\ /     ` `                         :
-:    o  0   o  0  "  '    _   \  \  \ <`v~\<|                         `       :
-:    o  00o  0  0       ><v> _/   \ / _\\_/ \                             `   :
-:      o   0  o0  0    ><v> \|    /|_/  \      `     ,_ _"  |$11$             :
-:       00 oo00 0           |/   / /  _             <_<)\,><}  _              :
-:            00  0          /\ / // _/       ><v>     "#|'|#|_|#|  ``         :
-:           vV 0           / / || |/ /                |####|####|             :
-:         /vVv\vV\         \ |<v&@_&|      _   _   _  |###|||###|  _   _   _  :
-:       // vvV  \v\      &@@&\ _@//\&@&   ><^>|<^><#|_|#########|_|#|_|#|_|#| :
-:     /   \  vV  |V\\   &@&/\&@&&|__\@@&  |#################################| :
-:    |     \ V Vv| v \  @&|\ |&@&&@&&@&&@ |#############/!!!!!\#############| :
-:  | |     | v\ v \   \@&@| \|&&&@@@&&@&&@|###|||##<^><#|     |#######|||###| :
-: /  /   /  \   V  \  &&@@| ||@&@&@&@&&&@&@###|||#######|     |#######|||###| :
-```
+![example freefish](README.gif)
 
 # Installation
 1. Clone the repository
