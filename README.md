@@ -206,7 +206,7 @@ Both the colors and highlihts sections contain charcters that will translate to 
 
 # Examples
 
-## fish
+### fish
 ```
 {
     "animation": 
@@ -265,7 +265,7 @@ Both the colors and highlihts sections contain charcters that will translate to 
     }
 }
 ```
-## duck
+### duck
 ```
 {
     "buoyancy": 1,      <--- one row of the duck above water level
@@ -325,6 +325,90 @@ Both the colors and highlihts sections contain charcters that will translate to 
             ["     ",
              "     ",
              "     "]
+        ]
+    }
+}
+```
+### tank
+```
+{
+    "depth": 2,   <--- top 2 rows have no water
+    "foreground": 
+    {
+        "symbols": 
+        [
+            [
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          "
+            ]
+        ],
+        "colors": 
+        [
+            [
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          "
+            ]
+        ],
+        "highlights": 
+        [
+            [
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          "
+            ]
+        ]
+    },
+    "background": 
+    {
+        "symbols": 
+        [
+            [
+                "@--------@",
+                "|        |",
+                "|^^^^^^^^|",   <--- water level here
+                "|        |",
+                "|        |",
+                "|        |",
+                "@--------@"
+            ]
+        ],
+        "colors": 
+        [
+            [
+                "YYYYYYYYYY",
+                "Y        Y",
+                "YbbbbbbbbY",
+                "Y        Y",
+                "Y        Y",
+                "Y        Y",
+                "YYYYYYYYYY"
+            ]
+        ],
+        "highlights": 
+        [
+            [
+                "yyyyyyyyyy",
+                "y        y",
+                "y        y",
+                "y        y",
+                "y        y",
+                "y        y",
+                "yyyyyyyyyy"
+            ]
         ]
     }
 }
