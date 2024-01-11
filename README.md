@@ -69,7 +69,7 @@ ducks
 freefish should now be setup and ready for use, but don't forget to try adding your own custom tanks and creatures to `~/.config/freefish` aswell!
 
 # Usage
-freefish is used to display a dynamic tank filled with various fish and ducks. This is done by using the tank, fish, and duck flags to specifiy available assets for display. These flags, and others, are further explained in this section.
+freefish is used to display a dynamic tank filled with various fish and ducks. This is done by using the tank, fish, and duck flags to specify available assets for display. These flags, and others, are further explained in this section.
 
 ```
 $ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
@@ -86,7 +86,7 @@ freefish will copy available assets from `./config`, if available, to populate t
 
 ## Listing Assets
 
-Avilable tanks, fish, and ducks are `.json` files placed into the appropriate subdirectories of ~/.config/freefsh/. They can be listed using the `-l` flag. The names of these assets can then be used to specifiy which tank to use and which fish and ducks to fill it with.
+Available tanks, fish, and ducks are `.json` files placed into the appropriate subdirectories of `~/.config/freefsh/`. They can be listed using the `-l` flag. The names of these assets can then be used to specify which tank to use and which fish and ducks to fill it with.
 ```
 $ freefish -l
 ```
@@ -126,7 +126,7 @@ Fish asset files are stored in  `~/.config/freefish/fish` and are `.json` files.
 - `animation` (see [Animations](animations))
     - `symbols`
     - `colors`
-    - `highligts`
+    - `highlights`
 - `flipped_animation` (see [Animations](animations))
     - `symbols`
     - `colors`
@@ -149,7 +149,7 @@ Duck asset files are stored in  `~/.config/freefish/fish` and are `.json` files.
 - `animation` (see [Animations](animations))
     - `symbols`
     - `colors`
-    - `highligts`
+    - `highlights`
 - `flipped_animation` (see [Animations](animations))
     - `symbols`
     - `colors`
@@ -178,7 +178,7 @@ freefish can be stopped by pressing the `q` or `Esc` keys.
 
 
 # Animations
-Assets comtains animations in their json files, which have the following key structure where the name of the animation varries.
+Assets contain animations in their json files, which have the following key structure where the name of the animation varies.
 
 - <animation_name>
     - `symbols`
@@ -191,29 +191,29 @@ See [examples](examples).
 
 ### symbols
 
-The symbols frames contains characters that make up the ascii art of the animation. Any space in this portion will be transparent, and the background will be rendered in its place. Keep in mind that the `\` and `"` charcters must be escaped using the `\` charcter in json strings. 
+The symbols frames contains characters that make up the ASCII art of the animation. Any space in this portion will be transparent, and the background will be rendered in its place. Keep in mind that the `\` and `"` characters must be escaped using the `\` character in json strings. 
 
 ### colors & highlights
 
-The `colors` and `highlihts` frames contain specific charcters that bring color to the corresponding charcters of the `symbols` frames. `colors` specifies the colors of the corresponding `symbols` charcter, while `highlights` specifies the color with which the corresponding `symbols` charcter will be highlighted. The following charcters are used in these frames to apply the specified color to the corresponding charcter or its highlight.
+The `colors` and `highlights` frames contain specific characters that bring color to the corresponding characters of the `symbols` frames. `colors` specifies the colors of the corresponding `symbols` character, while `highlights` specifies the color with which the corresponding `symbols` character will be highlighted. The following characters are used in these frames to apply the specified color to the corresponding character or its highlight.
 
-- 'a' : DarkGrey
-- 'r' : Red
-- 'g' : Green
-- 'y' : Yellow
-- 'b' : Blue
-- 'm' : Magenta
-- 'c' : Cyan
-- 'w' : White
+- `a` : DarkGrey
+- `r` : Red
+- `g` : Green
+- `y` : Yellow
+- `b` : Blue
+- `m` : Magenta
+- `c` : Cyan
+- `w` : White
 
-- 'A' : Black
-- 'R' : DarkRed
-- 'G' : DarkGreen
-- 'Y' : DarkYellow
-- 'B' : DarkBlue
-- 'M' : DarkMagenta
-- 'C' : DarkCyan
-- 'W' : Grey
+- `A` : Black
+- `R` : DarkRed
+- `G` : DarkGreen
+- `Y` : DarkYellow
+- `B` : DarkBlue
+- `M` : DarkMagenta
+- `C` : DarkCyan
+- `W` : Grey
 
 # Examples
 
