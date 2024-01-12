@@ -1,6 +1,6 @@
 {
     "depth": 3,
-    "foreground": {
+    "foreground_animation": {
         "symbols": [
             [
                 ":                                                                             :",
@@ -140,7 +140,7 @@
             ]
         ]
     },
-    "background": {
+    "background_animation": {
         "symbols": [
             [
                 "                                                                               ",

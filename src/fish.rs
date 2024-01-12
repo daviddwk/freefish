@@ -23,7 +23,7 @@ pub struct Fish {
 impl Fish {
     pub fn new(path: &PathBuf, name: &str, tank: &Tank) -> Self {
         let fish_json = open_json(path, name, "fish");
-        let fish_anim = load_animation(&fish_json, &format!("fish {}", name), "/animation");
+        let fish_anim = load_animation(&fish_json, &format!("fish {}", name), "/forward_animation");
         let flip_anim = load_animation(&fish_json, &format!("fish {}", name), "/flipped_animation");
 
         if fish_anim.len() != flip_anim.len(){

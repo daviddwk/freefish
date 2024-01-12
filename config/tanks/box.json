@@ -1,6 +1,6 @@
 {
     "depth": 0,
-    "foreground": 
+    "foreground_animation": 
     {
         "symbols": 
         [
@@ -39,7 +39,7 @@
             ]
         ]
     },
-    "background": 
+    "background_animation": 
     {
         "symbols": 
         [

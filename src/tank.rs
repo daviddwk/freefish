@@ -19,8 +19,8 @@ impl Tank {
     pub fn new(path: &PathBuf, name: &str) -> Self {
         let tank_json = open_json(path, name, "tank");
         let mut depth: usize = 0; 
-        let fg_anim = load_animation(&tank_json, &format!("tank {}", name), "/foreground");
-        let bg_anim = load_animation(&tank_json, &format!("tank {}", name), "/background");
+        let fg_anim = load_animation(&tank_json, &format!("tank {}", name), "/foreground_animation");
+        let bg_anim = load_animation(&tank_json, &format!("tank {}", name), "/background_animation");
 
         if fg_anim[0].len() != bg_anim[0].len() || fg_anim[0][0].len() != bg_anim[0][0].len() {
             error(&format!("tank {} has a mismatich in foreground and background size", name), 1);

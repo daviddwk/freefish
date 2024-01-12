@@ -78,11 +78,11 @@ A tank is specified with the `-t` flag followed by the name of a single tank.
 Tank asset files are stored in `~/.config/freefish/tanks` and are `.json` files. These json files should contain the following key structure.
 
 - `depth` (optional: defaults to 0)
-- `foreground` (see [Animations](#animations))
+- `foreground_animation` (see [Animations](#animations))
     - `symbols`
     - `colors`
     - `highlights`
-- `background` (see [Animations](#animations))
+- `background_animation` (see [Animations](#animations))
     - `symbols`
     - `colors`
     - `highlights`
@@ -92,8 +92,8 @@ See an [example](#example-tank).
 ### depth
 The `depth` key corresponds to a non-negative value that specifies the depth of the water surface. If this key is excluded the depth defalts to zero, placing the surface of the water at the top of the tank and allowing fish to swim anywhere. If a positive value is specified than the surface of the water will be placed `depth` lines down, leaving `depth` lines of "air" at the top of the tank where fish cannot swim. Ducks swim at the surface of the water, so it is important to give them space for where their heads peak above the water.
 
-### foreground & background
-The animation and flipped_animation [animations](#animations) should contain identically sized frames, but these animations NEED NOT have the same number of frames.
+### foreground\_animation & background\_animation
+The foraground\_animation and background\_animation [animations](#animations) should contain identically sized frames, but these animations NEED NOT have the same number of frames.
 
 ## Adding Fish
 
@@ -102,7 +102,7 @@ Fish are added to the tank using the `-f` flag followed by any number of fish na
 -f <fish_0> ... <fish_n>
 ```
 Fish asset files are stored in  `~/.config/freefish/fish` and are `.json` files. These json files should contain the following key structure.
-- `animation` (see [Animations](#animations))
+- `forward_animation` (see [Animations](#animations))
     - `symbols`
     - `colors`
     - `highlights`
@@ -113,9 +113,9 @@ Fish asset files are stored in  `~/.config/freefish/fish` and are `.json` files.
      
 See an [example](#example-fish).
  
-### animation & flipped_animation
+### forward\_animation & flipped\_animation
 
-The animation and flipped_animation [animations](#animations) should contain an identical number of identically sized frames.
+The forward\_animation and flipped\_animation [animations](#animations) should contain an identical number of identically sized frames.
 
 ## Adding Ducks
 Ducks are added to the tank using the `-d` flag followed by any number of duck names. The name of a duck may be used multiple times to add multiple of that duck to the tank. Those ducks specified first will be rendered in front of those listed later. This flag is optional, but it shouldn't be.
@@ -125,7 +125,7 @@ Ducks are added to the tank using the `-d` flag followed by any number of duck n
 Duck asset files are stored in  `~/.config/freefish/fish` and are `.json` files. These json files should contain the following key structure.
 
 - `buoyancy` (optional: defaults to 0)
-- `animation` (see [Animations](#animations))
+- `forward_animation` (see [Animations](#animations))
     - `symbols`
     - `colors`
     - `highlights`
@@ -140,9 +140,9 @@ See an [example](#example-duck).
 
 The `buoyancy` key corresponds to a value that specifies the number of lines of the duck that should appear above the surface of the water. If this key is excluded the buoyancy defoults to 0, so the top of the duck will be at the top layer of water. 
 
-### animation & flipped animation
+### forward\_animation & flipped animation
 
-The animation and flipped_animation [animations](#animations) should contain an identical number of identically sized frames.
+The forward\_animation and flipped\_animation [animations](#animations) should contain an identical number of identically sized frames.
 
 ## Adjusting Frame Speed
 
@@ -199,7 +199,7 @@ The `colors` and `highlights` frames contain specific characters that bring colo
 ## example fish
 ```
 {
-    "animation": 
+    "forward_animation": 
     {
         "symbols": 
         [
@@ -259,7 +259,7 @@ The `colors` and `highlights` frames contain specific characters that bring colo
 ```
 {
     "buoyancy": 1,      <--- one row of the duck above water level
-    "animation": {
+    "forward_animation": {
         "symbols": [
             ["  ()-",
              "<.v) ",   <--- water level here
@@ -323,7 +323,7 @@ The `colors` and `highlights` frames contain specific characters that bring colo
 ```
 {
     "depth": 2,   <--- top 2 rows have no water
-    "foreground": 
+    "foreground_animation": 
     {
         "symbols": 
         [
@@ -362,7 +362,7 @@ The `colors` and `highlights` frames contain specific characters that bring colo
             ]
         ]
     },
-    "background": 
+    "background_animation": 
     {
         "symbols": 
         [

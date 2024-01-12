@@ -1,6 +1,6 @@
 {
     "buoyancy": 1,
-    "animation": {
+    "forward_animation": {
         "symbols": [
             ["  ()-",
              "<.v) ",

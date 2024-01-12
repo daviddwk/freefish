@@ -25,7 +25,7 @@ pub struct Duck {
 impl Duck {
     pub fn new(path: &PathBuf, name: &str, tank: &Tank) -> Self {
         let duck_json: serde_json::Value = open_json(path, name, "duck"); 
-        let duck_anim = load_animation(&duck_json, &format!("duck {}", name), "/animation");
+        let duck_anim = load_animation(&duck_json, &format!("duck {}", name), "/forward_animation");
         let flip_anim = load_animation(&duck_json, &format!("duck {}", name), "/flipped_animation");
         let size = (duck_anim[0].len(), duck_anim[0][0].len());
         let mut buoyancy: usize = 0;
