@@ -1,105 +1,405 @@
 # rustyfish
-A free fish tank for your terminal! An improved and expanded version of freefish, and a good way for me to get started with Rust.
+A fish tank for your terminal that can be easily customized by creating new animated tanks, fish, and ducks. These assets are supplied as properly formatted `.json` files. This format makes creating colored frames of ASCII art simple.
+
+![example freefish](README.gif)
 
 # Installation
-* Clone this repository
+1. Clone the repository
+```
+$ git clone https://github.com/daviddwk/freefish.git
+$ cd freefish
+```
+2. Build freefish
+```
+$ cargo build
+```
+3. Initialize freefish
+
+freefish is initialized by running the binary with the init flag from from the cloned directory.
+```
+$ ./target/debug/freefish -i
+```
+This creates the following folders, and populates them with the assets provided in the `config` folder.
+
+- `~/.config/freefish/tanks`
+- `~/.config/freefish/fish`
+- `~/.config/freefish/ducks`
+
+4. Test that freefish was initialized properly
 
 ```
-git clone https://github.com/daviddwk/freefish.git
-cd freefish
+$ ./target/debug/freefish -l
 ```
 
-* Use cargo to build freefish
+The following output should be seen if freefish was initialized properly, possibly showing even more assets.
 
 ```
-cargo build
+fish
+ guppy.json
+ angel.json
+ clown.json
+tanks
+ box.json
+ aquarium.json
+ducks
+ duck.json
+```
 
-```
-* Initialize freefish 
-run the binary with the init from from the cloned directory
+freefish should now be setup and ready for use, but don't forget to try adding your own custom tanks and creatures to `~/.config/freefish` aswell!
 
-```
-./target/debug/freefish -i
-```
-this creates the following folders, and populated them with the assents provided in the config folder
-- ~/.config/tanks
-- ~/.config/fish
-- ~/.config/ducks
-
-* Test that freefish was initialized properly by using the list argument, which lists available assets
-```
-./target/debug/freefish -l
-```
 # Usage
+freefish is used to display a dynamic tank filled with various fish and ducks. This is done by using the tank, fish, and duck flags to specify available assets for display. These flags, and others, are further explained in this section.
 
-Freefish is used by specifiying a tank and filling it with various fish and ducks. This is done by using the corresponding tank, fish, and duck flags and specifiying available assets to be used. Available assets can be listed by using the -l flag when running freefish.
 ```
-./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
+$ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
 ```
 
-## Tank
-A single tank needs to be specified for freefish to display. This is done with the -t flag, following which a single argument should be suplied being the name of the desired tank. This tank may then be populated with fish and ducks.
+## Initializing
 
-A dank also has a depth attribute that describes how deep the water level is for said tank. If this field is left bland then then the whole tank may be occupied by swimming fish. 
+Initializing freefish using `-i` creates the following directories.
+- `~/.config/freefish/tanks`
+- `~/.config/freefish/fish`
+- `~/.config/freefish/ducks`
+  
+freefish will copy available assets from `./config`, if available, to populate the aforementioned directories. freefish should be initialized from the cloned directory to utilize the provided assets, but feel free to add your own assets to `~/.config/freefish`'s subdirectories manually!
 
-Tank asset files should be stored in ~/.config/tanks with the .json extention. They can then be utilzed using their name, excluding the .json extintion. These files should contain the following keys.
+## Listing Assets
 
-- depth (defaults to 0)
-- foreground (see Animation)
-    - symbols
-    - colors
-    - highlights
-- background (see Animation)
-    - symbols
-    - colors
-    - highlights
+Available tanks, fish, and ducks are `.json` files placed into the appropriate subdirectories of `~/.config/freefsh/`. They can be listed using the `-l` flag. The names of these assets can then be used to specify which tank to use and which fish and ducks to fill it with.
+```
+$ freefish -l
+```
+
+## Selecting a Tank
+A tank is specified with the `-t` flag followed by the name of a single tank.
+```
+-t <tank>
+```
+Tank asset files are stored in `~/.config/freefish/tanks` and are `.json` files. These json files should contain the following key structure.
+
+- `depth` (optional: defaults to 0)
+- `foreground` (see [Animations](#animations))
+    - `symbols`
+    - `colors`
+    - `highlights`
+- `background` (see [Animations](#animations))
+    - `symbols`
+    - `colors`
+    - `highlights`
+ 
+See an [example](#example-tank).
 
 ### depth
+The `depth` key corresponds to a non-negative value that specifies the depth of the water surface. If this key is excluded the depth defalts to zero, placing the surface of the water at the top of the tank and allowing fish to swim anywhere. If a positive value is specified than the surface of the water will be placed `depth` lines down, leaving `depth` lines of "air" at the top of the tank where fish cannot swim. Ducks swim at the surface of the water, so it is important to give them space for where their heads peak above the water.
 
 ### foreground & background
+The animation and flipped_animation [animations](#animations) should contain identically sized frames, but these animations NEED NOT have the same number of frames.
 
-The foreground and background should both be animations of the same size, but they NEED NOT have the same numbers of frames. 
+## Adding Fish
 
-## Fish
-A tank may be populated by fish that will swim around the available area. Using the -f flag, one should follow this flag with the desired fish to populate the tank. An argument for the same fish may be supplied multiple times to add multiple of that fish. Those fish listed first will be rendered in front of those listed later.
+Fish are added to the tank using the `-f` flag followed by any number of fish names. The name of a fish may be used multiple times to add multiple of that fish to the tank. Those fish specified first will be rendered in front of those listed later. This flag is optional, but who wants a tank with no fish?
+```
+-f <fish_0> ... <fish_n>
+```
+Fish asset files are stored in  `~/.config/freefish/fish` and are `.json` files. These json files should contain the following key structure.
+- `animation` (see [Animations](#animations))
+    - `symbols`
+    - `colors`
+    - `highlights`
+- `flipped_animation` (see [Animations](#animations))
+    - `symbols`
+    - `colors`
+    - `highlights`
+     
+See an [example](#example-fish).
+ 
+### animation & flipped_animation
 
-## Ducks
-Adding ducks to the tank works similarly as fish. Using the -d flag, one can supply a number of ducks to the tank. These ducks will swim back and forth across the top of the water level, specificed by the tank's depth flag.
+The animation and flipped_animation [animations](#animations) should contain an identical number of identically sized frames.
+
+## Adding Ducks
+Ducks are added to the tank using the `-d` flag followed by any number of duck names. The name of a duck may be used multiple times to add multiple of that duck to the tank. Those ducks specified first will be rendered in front of those listed later. This flag is optional, but it shouldn't be.
+```
+-d <duck_0> ... <duck_n>
+```
+Duck asset files are stored in  `~/.config/freefish/fish` and are `.json` files. These json files should contain the following key structure.
+
+- `buoyancy` (optional: defaults to 0)
+- `animation` (see [Animations](#animations))
+    - `symbols`
+    - `colors`
+    - `highlights`
+- `flipped_animation` (see [Animations](#animations))
+    - `symbols`
+    - `colors`
+    - `highlights`
+
+See an [example](#example-duck).
+
+### buoyancy
+
+The `buoyancy` key corresponds to a value that specifies the number of lines of the duck that should appear above the surface of the water. If this key is excluded the buoyancy defoults to 0, so the top of the duck will be at the top layer of water. 
+
+### animation & flipped animation
+
+The animation and flipped_animation [animations](#animations) should contain an identical number of identically sized frames.
+
+## Adjusting Frame Speed
+
+The delay between frames can be modified using the `-s` flag followed by the desired delay between frames in ms. The default delay is 200ms.
+```
+-s <delay_ms>
+```
+
+## Quitting
+
+freefish can be stopped by pressing the `q` or `Esc` keys.
+
 
 # Animations
-Each sort of asset (tanks fish, and ducks) comtains animations in their json file, which consists of a name and the following subkeys.
+Assets contain animations in their json files, which have the following key structure where the name of the animation varies.
 
-- animation
-    - symbols
-    - colors
-    - highlights
+- <animation_name>
+    - `symbols`
+    - `colors`
+    - `highlights`
 
-Each of the subkeys should contain a list of frames, which is expressed as a list of list of strings. Each frame must be the same size, thus contaning the same number of strings where each string is the same length.
+The `symbols` `colors`, and `highlights` keys each correspond to a list of frames, where each frame is a list of strings. Each key corresponds to a list of frames of the same length, each frame must have the same number of strings, and each string must be the same length.
 
-Frames are broken up into thee speerate parts, each expressed as an equal size matrix of characters. These parts, symbols, colors and highlihts, and explained below.
+See [examples](#examples).
 
 ### symbols
 
-This portion contains the characters that make up the ascii art of the animation. Any space in this portion will be transparent, and the background will be rendered in its place.
+The symbols frames contains characters that make up the ASCII art of the animation. Any space in this portion will be transparent, and the background will be rendered in its place. Keep in mind that the `\` and `"` characters must be escaped using the `\` character in json strings. 
 
 ### colors & highlights
 
-Both the colors and highlihts sections contain charcters that will translate to the color of the charcters and their highlights specified under the symbols key. Each color character corresponds to the symbol located in the same position as the symbols matrix. The following color charcters can be used to color and highlight symbols with the terminals color palette.
+The `colors` and `highlights` frames contain specific characters that bring color to the corresponding characters of the `symbols` frames. `colors` specifies the colors of the corresponding `symbols` character, while `highlights` specifies the color with which the corresponding `symbols` character will be highlighted. The following characters are used in these frames to apply the specified color to the corresponding character or its highlight.
 
-- 'a' : DarkGrey
-- 'r' : Red
-- 'g' : Green
-- 'y' : Yellow
-- 'b' : Blue
-- 'm' : Magenta
-- 'c' : Cyan
-- 'w' : White
+- `a` : DarkGrey
+- `r` : Red
+- `g` : Green
+- `y` : Yellow
+- `b` : Blue
+- `m` : Magenta
+- `c` : Cyan
+- `w` : White
 
-- 'A' : Black
-- 'R' : DarkRed
-- 'G' : DarkGreen
-- 'Y' : DarkYellow
-- 'B' : DarkBlue
-- 'M' : DarkMagenta
-- 'C' : DarkCyan
-- 'W' : Grey
+- `A` : Black
+- `R` : DarkRed
+- `G` : DarkGreen
+- `Y` : DarkYellow
+- `B` : DarkBlue
+- `M` : DarkMagenta
+- `C` : DarkCyan
+- `W` : Grey
+
+# Examples
+
+## example fish
+```
+{
+    "animation": 
+    {
+        "symbols": 
+        [
+            ["  n ",
+             "><v>"],
+
+            ["  n ",
+             "><^>"]
+        ],
+        "colors": 
+        [
+            ["  n ",
+             "mmrm"],
+
+            ["  n ",
+             "mmrm"]
+        ],
+        "highlights": 
+        [
+            ["    ",
+             "    "],
+
+            ["    ",
+             "    "]
+        ]
+    },
+    "flipped_animation": 
+    {
+        "symbols": 
+        [
+            [" n  ",
+             "<v><"],
+
+            [" n  ",
+             "<^><"]
+        ],
+        "colors": 
+        [
+            [" m  ",
+             "mrmm"],
+
+            [" m  ",
+             "mrmm"]
+        ],
+        "highlights": 
+        [
+            ["    ",
+             "    "],
+
+            ["    ",
+             "    "]
+        ]
+    }
+}
+```
+## example duck
+```
+{
+    "buoyancy": 1,      <--- one row of the duck above water level
+    "animation": {
+        "symbols": [
+            ["  ()-",
+             "<.v) ",   <--- water level here
+             " ^^  "],
+
+            ["  ()<",
+             "<.v) ",
+             " ^^  "]
+        ],
+        "colors": [
+            ["  wwy",
+             "wwww ",
+             " yy  "],
+
+            ["  wwy",
+             "wwww ",
+             " yy  "]
+        ],
+        "highlights": [
+            ["     ",
+             "     ",
+             "     "],
+
+            ["     ",
+             "     ",
+             "     "]
+        ]
+    },
+    "flipped_animation": {
+        "symbols": [
+            [">()  ",
+             " (v.>",   <--- water level here
+             "  ^^ "],
+
+            ["-()  ",
+             " (v.>",
+             "  ^^ "]
+        ],
+        "colors": [
+            ["yww  ",
+             " wwww",
+             "  yy "],
+
+            ["yww  ",
+             " wwww",
+             "  yy "]
+        ],
+        "highlights": [
+            ["     ",
+             "     ",
+             "     "],
+
+            ["     ",
+             "     ",
+             "     "]
+        ]
+    }
+}
+```
+## example tank
+```
+{
+    "depth": 2,   <--- top 2 rows have no water
+    "foreground": 
+    {
+        "symbols": 
+        [
+            [
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          "
+            ]
+        ],
+        "colors": 
+        [
+            [
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          "
+            ]
+        ],
+        "highlights": 
+        [
+            [
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          ",
+                "          "
+            ]
+        ]
+    },
+    "background": 
+    {
+        "symbols": 
+        [
+            [
+                "@--------@",
+                "|        |",
+                "|^^^^^^^^|",   <--- top row where fish can swim
+                "|        |",
+                "|        |",
+                "|        |",
+                "@--------@"
+            ]
+        ],
+        "colors": 
+        [
+            [
+                "YYYYYYYYYY",
+                "Y        Y",
+                "YbbbbbbbbY",
+                "Y        Y",
+                "Y        Y",
+                "Y        Y",
+                "YYYYYYYYYY"
+            ]
+        ],
+        "highlights": 
+        [
+            [
+                "yyyyyyyyyy",
+                "y        y",
+                "y        y",
+                "y        y",
+                "y        y",
+                "y        y",
+                "yyyyyyyyyy"
+            ]
+        ]
+    }
+}
+```
