@@ -86,7 +86,9 @@ Tank asset files are stored in `~/.config/freefish/tanks` and are `.json` files.
     - `symbols`
     - `colors`
     - `highlights`
- 
+
+Creatures will swim in front of the background animation, but behind the foreground animation.
+
 See an [example](#example-tank).
 
 ### depth
