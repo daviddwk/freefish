@@ -1,5 +1,5 @@
 {
-    "depth": 0,
+    "depth": 2,
     "foreground_animation": 
     {
         "symbols": 
@@ -46,7 +46,7 @@
             [
                 "@--------@",
                 "|        |",
-                "|        |",
+                "|^^^^^^^^|",
                 "|        |",
                 "|        |",
                 "|        |",
@@ -56,25 +56,25 @@
         "colors": 
         [
             [
-                "          ",
-                "          ",
-                "          ",
-                "          ",
-                "          ",
-                "          ",
-                "          "
+                "YYYYYYYYYY",
+                "Y        Y",
+                "YbbbbbbbbY",
+                "Y        Y",
+                "Y        Y",
+                "Y        Y",
+                "YYYYYYYYYY"
             ]
         ],
         "highlights": 
         [
             [
-                "          ",
-                "          ",
-                "          ",
-                "          ",
-                "          ",
-                "          ",
-                "          "
+                "yyyyyyyyyy",
+                "y        y",
+                "y        y",
+                "y        y",
+                "y        y",
+                "y        y",
+                "yyyyyyyyyy"
             ]
         ]
     }
