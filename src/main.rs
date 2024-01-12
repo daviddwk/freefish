@@ -36,6 +36,7 @@ use crossterm::{
 };
 extern crate rand;
 extern crate home;
+extern crate serde_json;
 
 mod tank;
 use tank::Tank;
@@ -47,7 +48,7 @@ mod animation;
 mod color_glyph;
 mod error;
 use error::error;
-
+mod open_json;
 
 fn main() {
     let args: Vec<String> = args().collect();

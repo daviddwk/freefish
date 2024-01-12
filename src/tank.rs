@@ -1,12 +1,11 @@
-use std::fs::File;
 use std::path::PathBuf;
 use std::convert::TryFrom;
 
-extern crate serde_json;
 use rand::Rng;
 
 use animation::{Animation, load_animation};
 use error::error;
+use open_json::open_json;
 
 pub struct Tank {
     pub size: (usize, usize),
@@ -18,19 +17,14 @@ pub struct Tank {
 }
 impl Tank {
     pub fn new(path: &PathBuf, name: &str) -> Self {
-        let tank_file = File::open(path.join(format!("{}.json", name)))
-            .expect(&format!("{}.json should open", name));
-        let tank_json: serde_json::Value = serde_json::from_reader(tank_file)
-            .expect(&format!("{}.json should be JSON", name));
-        let mut depth: usize = 0;
-        
+        let tank_json = open_json(path, name, "tank");
+        let mut depth: usize = 0; 
         let fg_anim = load_animation(&tank_json, &format!("tank {}", name), "/foreground");
         let bg_anim = load_animation(&tank_json, &format!("tank {}", name), "/background");
 
         if fg_anim[0].len() != bg_anim[0].len() || fg_anim[0][0].len() != bg_anim[0][0].len() {
             error(&format!("tank {} has a mismatich in foreground and background size", name), 1);
-        }
-        
+        } 
         if tank_json["depth"].is_u64() {
             depth = usize::try_from(tank_json["depth"].as_u64().unwrap()).unwrap();
         }

@@ -1,4 +1,3 @@
-use std::fs::File;
 use std::path::PathBuf;
 
 extern crate serde_json;
@@ -9,6 +8,7 @@ use tank::Tank;
 use animation::{Animation, load_animation, glyph_from_animation};
 use color_glyph::ColorGlyph;
 use error::error;
+use open_json::open_json;
 
 pub struct Fish {
     pos: (usize, usize),
@@ -22,11 +22,7 @@ pub struct Fish {
 
 impl Fish {
     pub fn new(path: &PathBuf, name: &str, tank: &Tank) -> Self {
-        let fish_file = File::open(path.join(format!("{}.json", name)))
-            .expect(&format!("{}.json should open", name));
-        let fish_json: serde_json::Value = serde_json::from_reader(fish_file)
-            .expect(&format!("{}.json should be JSON", name));
-        
+        let fish_json = open_json(path, name, "fish");
         let fish_anim = load_animation(&fish_json, &format!("fish {}", name), "/animation");
         let flip_anim = load_animation(&fish_json, &format!("fish {}", name), "/flipped_animation");
 

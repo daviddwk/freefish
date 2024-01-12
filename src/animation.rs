@@ -7,7 +7,6 @@ use error::error;
 pub type Animation = Vec<Vec<Vec<ColorGlyph>>>;
 
 pub fn load_animation(json: &serde_json::Value, name: &str, anim_key: &str) -> Animation {
-    println!("{}", name);
     let mut out_anim: Animation = Vec::new();
     let symbols = json.pointer(&format!("{}/symbols", anim_key))
         .expect(&format!("{} should have symbols key", anim_key));

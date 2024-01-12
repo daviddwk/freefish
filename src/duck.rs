@@ -1,14 +1,13 @@
-use std::fs::File;
 use std::path::PathBuf;
 use std::convert::TryFrom;
 
-extern crate serde_json;
 use rand::Rng;
 
 use tank::Tank;
 use animation::{Animation, load_animation};
 use color_glyph::*;
 use error::error;
+use open_json::open_json;
 
 pub struct Duck {
     pos: (usize, usize),
@@ -25,15 +24,10 @@ pub struct Duck {
 
 impl Duck {
     pub fn new(path: &PathBuf, name: &str, tank: &Tank) -> Self {
-        let duck_file = File::open(path.join(format!("{}.json", name)))
-            .expect(&format!("{}.json should open", name));
-        let duck_json: serde_json::Value = serde_json::from_reader(duck_file)
-            .expect(&format!("{}.json should be JSON", name));
-        
+        let duck_json: serde_json::Value = open_json(path, name, "duck"); 
         let duck_anim = load_animation(&duck_json, &format!("duck {}", name), "/animation");
         let flip_anim = load_animation(&duck_json, &format!("duck {}", name), "/flipped_animation");
         let size = (duck_anim[0].len(), duck_anim[0][0].len());
-        println!("{} {}", size.0, size.1);
         let mut buoyancy: usize = 0;
         
         if duck_json["buoyancy"].is_u64() {
