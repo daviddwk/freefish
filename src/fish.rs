@@ -8,6 +8,7 @@ use self::rand::Rng;
 use tank::Tank;
 use animation::{Animation, load_animation, glyph_from_animation};
 use color_glyph::ColorGlyph;
+use error::error;
 
 pub struct Fish {
     pos: (usize, usize),
@@ -30,17 +31,17 @@ impl Fish {
         let flip_anim = load_animation(&fish_json, &format!("fish {}", name), "/flipped_animation");
 
         if fish_anim.len() != flip_anim.len(){
-            panic!("{} mismatch fish and flip number of frames", name);
+            error(&format!("fish {} has a mismatch in fish and flip length", name), 1);
         }
         if fish_anim[0].len() != flip_anim[0].len() || fish_anim[0][0].len() != flip_anim[0][0].len() {
-            panic!("{} mismatch fish and flip size", name);
+            error(&format!("fish {} has a mismatch in fish and flip size", name), 1);
         }
 
         let mut rng = rand::thread_rng(); 
         let size = (fish_anim[0].len(), fish_anim[0][0].len());
         
         if tank.size.0 <= size.0 + tank.depth || tank.size.1 <= size.1 {
-            panic!("{} too large for tank", name)
+            error(&format!("fish {} too large for tank", name), 1);
         }
         let pos_range = (0 + tank.depth..=tank.size.0 - size.0, 0..=tank.size.1 - size.1);
 

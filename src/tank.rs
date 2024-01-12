@@ -6,6 +6,7 @@ extern crate serde_json;
 use rand::Rng;
 
 use animation::{Animation, load_animation};
+use error::error;
 
 pub struct Tank {
     pub size: (usize, usize),
@@ -27,7 +28,7 @@ impl Tank {
         let bg_anim = load_animation(&tank_json, &format!("tank {}", name), "/background");
 
         if fg_anim[0].len() != bg_anim[0].len() || fg_anim[0][0].len() != bg_anim[0][0].len() {
-            panic!("{} mismatich in foreground and background size", name);
+            error(&format!("tank {} has a mismatich in foreground and background size", name), 1);
         }
         
         if tank_json["depth"].is_u64() {

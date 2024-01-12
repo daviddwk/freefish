@@ -45,6 +45,8 @@ mod duck;
 use duck::Duck;
 mod animation;
 mod color_glyph;
+mod error;
+use error::error;
 
 
 fn main() {
@@ -78,8 +80,11 @@ fn main() {
                 if arg.chars().next() != Some('-') {
                     args_iter.next();
                     match arg.parse::<u64>() {
-                        Err(e) => panic!("Invalid speed argument\n{}", e),
+                        Err(_e) => error("Invalid argument supplied with -s", 1),
                         Ok(a) => speed_arg = a,
+                    }
+                    if speed_arg == 0 {
+                        error("Invalid argument supplied with -s", 1);
                     }
                 }
             }
@@ -152,7 +157,7 @@ fn main() {
                     Ok(f) =>
                         if f.path().extension() == Some(OsStr::new("json")) {
                             // should use file_prefix instead of file_name, but is experimental
-                            println!("{}", f.path().file_name().unwrap().to_str().unwrap()); 
+                            println!(" {}", f.path().file_name().unwrap().to_str().unwrap()); 
                         },
                 };
             }
@@ -160,7 +165,9 @@ fn main() {
         exit(0);
     }
     
-    if tank_arg.is_empty() { panic!("No tank was selected"); }
+    if tank_arg.is_empty() { 
+        error("No tank was selected", 1);
+    }
     let mut tank: Tank = Tank::new(&tanks_dir, &tank_arg);
     let mut fishies: Vec<Fish> = Vec::new();
     let mut duckies: Vec<Duck> = Vec::new();

@@ -8,6 +8,7 @@ use rand::Rng;
 use tank::Tank;
 use animation::{Animation, load_animation};
 use color_glyph::*;
+use error::error;
 
 pub struct Duck {
     pos: (usize, usize),
@@ -31,26 +32,29 @@ impl Duck {
         
         let duck_anim = load_animation(&duck_json, &format!("tank {}", name), "/animation");
         let flip_anim = load_animation(&duck_json, &format!("tank {}", name), "/flipped_animation");
-
+        let size = (duck_anim[0].len(), duck_anim[0][0].len());
+        println!("{} {}", size.0, size.1);
         let mut buoyancy: usize = 0;
+        
         if duck_json["buoyancy"].is_u64() {
             buoyancy = usize::try_from(duck_json["buoyancy"].as_u64().unwrap()).unwrap();
         }
 
         if duck_anim.len() != flip_anim.len(){
-            panic!("{} mismatch duck and flip number of frames", name);
+            error(&format!("duck {} has a mismatch in duck and flip length", name), 1);
         }
         if duck_anim[0].len() != flip_anim[0].len() || duck_anim[0][0].len() != flip_anim[0][0].len() {
-            panic!("{} mismatch duck and flip size", name);
+            error(&format!("duck {} has a mismatch in duck and flip size", name), 1);
         }
         if tank.depth < buoyancy {
-            panic!("{} does not fit on tank\ntry adjusting the tank's depth or the duck's buoyancy", name);
+            error(&format!("duck {} does not fit in the tank\n try adding depth to the tank for headroom", name), 1);
         }
+
         let mut rng = rand::thread_rng();
         return Self {
-            pos:        (tank.depth - buoyancy, rng.gen_range(0..tank.size.1)),
-            dest:       (tank.depth - buoyancy, rng.gen_range(0..tank.size.1)),
-            size:       (duck_anim[0].len(), duck_anim[0][0].len()),
+            pos:        (tank.depth - buoyancy, rng.gen_range(0..=tank.size.1 - size.1)),
+            dest:       (tank.depth - buoyancy, rng.gen_range(0..=tank.size.1 - size.1)),
+            size,
             buoyancy,
             tank_size:  tank.size,
             tank_depth: tank.depth,
@@ -81,7 +85,7 @@ impl Duck {
             let mut rng = rand::thread_rng();
             self.dest = (
                 self.tank_depth - self.buoyancy, 
-                rng.gen_range(0..self.tank_size.1)
+                rng.gen_range(0..=self.tank_size.1 - self.size.1)
             );
         }
     }
