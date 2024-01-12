@@ -6,8 +6,8 @@ A fish tank for your terminal that can be easily customized by creating new anim
 # Installation
 1. Clone the repository
 ```
-$ git clone https://github.com/daviddwk/freefish.git
-$ cd freefish
+$ git clone https://github.com/daviddwk/rustyfish
+$ cd rustyfish
 ```
 2. Build freefish
 ```
