@@ -2,10 +2,12 @@ extern crate serde_json;
 use crossterm::style::Color;
 
 use color_glyph::ColorGlyph;
+use error::error;
 
 pub type Animation = Vec<Vec<Vec<ColorGlyph>>>;
 
 pub fn load_animation(json: &serde_json::Value, name: &str, anim_key: &str) -> Animation {
+    println!("{}", name);
     let mut out_anim: Animation = Vec::new();
     let symbols = json.pointer(&format!("{}/symbols", anim_key))
         .expect(&format!("{} should have symbols key", anim_key));
@@ -74,34 +76,34 @@ pub fn load_animation(json: &serde_json::Value, name: &str, anim_key: &str) -> A
 
 fn check_format(json_array: &serde_json::Value, name: &str) {
     if !json_array.is_array() { 
-        panic!("{} is not an array", name);
+        error(&format!("{} is not an array", name), 1);
     }
     if !json_array[0].is_array() { 
-        panic!("{}[0] is not an array", name); 
+        error(&format!("{}[0] is not an array", name), 1); 
     }
     if !json_array[0][0].is_string() { 
-        panic!("{}[0][0] is not a string", name); 
+        error(&format!("{}[0][0] is not a string", name), 1);
     }
     if !json_array[0][0].as_str().unwrap().len() == 0 {
-        panic!("{}[0][0] is an empty string", name)
+        error(&format!("{}[0][0] is an empty string", name), 1);
     }
 }
 
 fn check_array(json_array: &serde_json::Value, target_size: usize, name: &str) {
     if !json_array.is_array() { 
-        panic!("{} is not an array", name); 
+        error(&format!("{} is not an array", name), 1);
     }
     if json_array.as_array().unwrap().len() != target_size {
-        panic!("{} differs in length", name);
+        error(&format!("{} differs in length", name), 1);
     }
 }
 
 fn check_string(json_string: &serde_json::Value, target_size: usize, name: &str) {
     if !json_string.is_string() { 
-        panic!("{} is not a string", name); 
+        error(&format!("{} is not a string", name), 1);
     }
     if json_string.as_str().unwrap().len() != target_size {
-        panic!("{} differs in length", name);
+        error(&format!("{} differs in length", name), 1);
     }
 }
 
@@ -132,7 +134,7 @@ fn match_color(color: char) -> Option<Color> {
 pub fn glyph_from_animation(anim: &Vec<Vec<Vec<ColorGlyph>>>, frame_idx: usize, row_idx: usize, glyph_idx: usize, position: (usize, usize)) -> Option<&ColorGlyph> {
     let frame_idx_oob = frame_idx >= anim.len();
     if frame_idx_oob {
-        panic!("Attempted to access frame out of bounds")
+        error(&format!("Attempted to access frame out of bounds"), 1);
     }
     let row_idx_oob = (row_idx < position.0) || (row_idx - position.0 >= anim[frame_idx].len());
     if row_idx_oob {

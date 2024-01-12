@@ -30,8 +30,8 @@ impl Duck {
         let duck_json: serde_json::Value = serde_json::from_reader(duck_file)
             .expect(&format!("{}.json should be JSON", name));
         
-        let duck_anim = load_animation(&duck_json, &format!("tank {}", name), "/animation");
-        let flip_anim = load_animation(&duck_json, &format!("tank {}", name), "/flipped_animation");
+        let duck_anim = load_animation(&duck_json, &format!("duck {}", name), "/animation");
+        let flip_anim = load_animation(&duck_json, &format!("duck {}", name), "/flipped_animation");
         let size = (duck_anim[0].len(), duck_anim[0][0].len());
         println!("{} {}", size.0, size.1);
         let mut buoyancy: usize = 0;
