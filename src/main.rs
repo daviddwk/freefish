@@ -54,20 +54,21 @@ mod open_json;
 
 
 #[derive(StructOpt)]
+#[structopt(name = "freefish", about = "Displays an animated fish tank to your terminal!")]
 struct Opt {
-    #[structopt(short = "h", long = "help")]
-    help: bool,
-    #[structopt(short = "l", long = "list")]
+    //#[structopt(short = "h", long = "help")]
+    //help: bool,
+    #[structopt(short = "l", long = "list", help = "Lists available assets found in ~/.config/freefish/")]
     list: bool,
-    #[structopt(short = "i", long = "init")]
+    #[structopt(short = "i", long = "init", help = "Copies assets from ./config to ~/.config/freefish/")]
     init: bool,
-    #[structopt(short = "s", long = "speed", default_value = "200")]
+    #[structopt(short = "s", long = "speed", default_value = "200", help = "Sets the delay between frames in ms")]
     speed: u64,
-    #[structopt(short = "f", long = "fish")]
+    #[structopt(short = "f", long = "fish", help = "Adds the specified fish to your fish tank")]
     fish: Vec<String>,
-    #[structopt(short = "d", long = "ducks")]
+    #[structopt(short = "d", long = "ducks", help = "Adds the specified ducks to your fish tank")]
     ducks: Vec<String>,
-    #[structopt(short = "t", long = "tank")]
+    #[structopt(short = "t", long = "tank", help = "Selects a tank")]
     tank: String, 
 
 }
@@ -79,10 +80,12 @@ fn main() {
     let tanks_dir = freefish_dir.join("tanks");
     let ducks_dir = freefish_dir.join("ducks");
     
+    /*
     if args.help {
         println!("Help text");
         exit(0);
     }
+    */
 
     if args.init {
         create_dir_all(freefish_dir.clone()).unwrap();
