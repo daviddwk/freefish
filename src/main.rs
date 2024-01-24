@@ -1,4 +1,3 @@
-use std::env::args;
 use std::process::exit;
 use std::time::{Duration, SystemTime};
 use std::io::stdout;
@@ -9,6 +8,9 @@ use std::fs::{
     read_dir, 
     copy
 };
+
+extern crate structopt;
+use structopt::StructOpt;
 
 extern crate crossterm;
 use crossterm::{
@@ -50,79 +52,39 @@ mod error;
 use error::error;
 mod open_json;
 
-fn main() {
-    let args: Vec<String> = args().collect();
 
-    let mut help_arg: bool = false;
-    let mut list_arg: bool = false;
-    let mut init_arg: bool = false;
-    let mut speed_arg: u64 = 200;
-    let mut tank_arg = String::new();
-    let mut fish_args: Vec<String> = Vec::new();
-    let mut duck_args: Vec<String> = Vec::new();
-    
+#[derive(StructOpt)]
+struct Opt {
+    #[structopt(short = "h", long = "help")]
+    help: bool,
+    #[structopt(short = "l", long = "list")]
+    list: bool,
+    #[structopt(short = "i", long = "init")]
+    init: bool,
+    #[structopt(short = "s", long = "speed", default_value = "200")]
+    speed: u64,
+    #[structopt(short = "f", long = "fish")]
+    fish: Vec<String>,
+    #[structopt(short = "d", long = "ducks")]
+    ducks: Vec<String>,
+    #[structopt(short = "t", long = "tank")]
+    tank: String, 
+
+}
+
+fn main() {
+    let args = Opt::from_args();
     let freefish_dir = home::home_dir().unwrap().join(".config").join("freefish");
     let fish_dir = freefish_dir.join("fish");
     let tanks_dir = freefish_dir.join("tanks");
     let ducks_dir = freefish_dir.join("ducks");
     
-    let mut args_iter = args.iter().skip(1);
-
-    while let Some(arg) = args_iter.next() {
-        if arg.eq("-h") {
-            help_arg = true;
-        } else if arg.eq("-i") {
-            init_arg = true;
-        } else if arg.eq("-l") {
-            list_arg = true;
-        } else if arg.eq("-s") {
-            let mut tmp_args_iter = args_iter.clone();
-            if let Some(arg) = tmp_args_iter.next() {
-                if arg.chars().next() != Some('-') {
-                    args_iter.next();
-                    match arg.parse::<u64>() {
-                        Err(_e) => error("Invalid argument supplied with -s", 1),
-                        Ok(a) => speed_arg = a,
-                    }
-                    if speed_arg == 0 {
-                        error("Invalid argument supplied with -s", 1);
-                    }
-                }
-            }
-        } else if arg.eq("-t") {
-            let mut tmp_args_iter = args_iter.clone();
-            if let Some(arg) = tmp_args_iter.next() {
-                if arg.chars().next() != Some('-') {
-                    args_iter.next();
-                    tank_arg = arg.clone();
-                }
-            }
-        } else if arg.eq("-f") {
-            let mut tmp_args_iter = args_iter.clone();
-            while let Some(arg) = tmp_args_iter.next() {
-                if arg.chars().next() == Some('-') { break; }
-                args_iter.next();
-                fish_args.push(arg.clone()); 
-            }
-        } else if arg.eq("-d") {
-            let mut tmp_args_iter = args_iter.clone();
-            while let Some(arg) = tmp_args_iter.next() {
-                if arg.chars().next() == Some('-') { break; }
-                args_iter.next();
-                duck_args.push(arg.clone()); 
-            }
-        } else {
-            println!("invalid argument {}\ntry -h for help", arg);
-            exit(1);
-        }
-    }
-    
-    if help_arg {
+    if args.help {
         println!("Help text");
         exit(0);
     }
 
-    if init_arg {
+    if args.init {
         create_dir_all(freefish_dir.clone()).unwrap();
         for asset_dir in [&fish_dir, &tanks_dir, &ducks_dir] {
             if !asset_dir.exists() {
@@ -145,7 +107,7 @@ fn main() {
         exit(0);
     }
 
-    if list_arg {
+    if args.list {
         let fish_files = read_dir("./config/fish").unwrap();
         let tank_files = read_dir("./config/tanks").unwrap();
         let duck_files = read_dir("./config/ducks").unwrap();
@@ -166,17 +128,17 @@ fn main() {
         exit(0);
     }
     
-    if tank_arg.is_empty() { 
+    if args.tank.is_empty() { 
         error("No tank was selected", 1);
     }
-    let mut tank: Tank = Tank::new(&tanks_dir, &tank_arg);
+    let mut tank: Tank = Tank::new(&tanks_dir, &args.tank);
     let mut fishies: Vec<Fish> = Vec::new();
     let mut duckies: Vec<Duck> = Vec::new();
 
-    for arg in fish_args {
+    for arg in args.fish {
         fishies.push(Fish::new(&fish_dir, &arg, &tank));
     }
-    for arg in duck_args {
+    for arg in args.ducks {
         duckies.push(Duck::new(&ducks_dir, &arg, &tank));
     }
     
@@ -229,7 +191,7 @@ fn main() {
         tank.update();
         
         // there must be a better way
-        let frame_duration = Duration::from_millis(speed_arg);
+        let frame_duration = Duration::from_millis(args.speed);
         let frame_start = SystemTime::now();
         let mut now = SystemTime::now();
         while now.duration_since(frame_start).unwrap() < frame_duration {
