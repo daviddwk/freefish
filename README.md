@@ -56,7 +56,7 @@ $ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
 
 ## Initializing
 
-Initializing freefish using `-i` creates the following directories.
+Initializing freefish using `-i` or `--init` creates the following directories.
 - `~/.config/freefish/tanks`
 - `~/.config/freefish/fish`
 - `~/.config/freefish/ducks`
@@ -65,13 +65,13 @@ freefish will copy available assets from `./config`, if available, to populate t
 
 ## Listing Assets
 
-Available tanks, fish, and ducks are `.json` files placed into the appropriate subdirectories of `~/.config/freefsh/`. They can be listed using the `-l` flag. The names of these assets can then be used to specify which tank to use and which fish and ducks to fill it with.
+Available tanks, fish, and ducks are `.json` files placed into the appropriate subdirectories of `~/.config/freefsh/`. They can be listed using the `-l` or `--list` flag. The names of these assets can then be used to specify which tank to use and which fish and ducks to fill it with.
 ```
 $ freefish -l
 ```
 
 ## Selecting a Tank
-A tank is specified with the `-t` flag followed by the name of a single tank.
+A tank is specified with the `-t` or `--tank` flag followed by the name of a single tank.
 ```
 -t <tank>
 ```
@@ -99,7 +99,7 @@ The foraground\_animation and background\_animation [animations](#animations) sh
 
 ## Adding Fish
 
-Fish are added to the tank using the `-f` flag followed by any number of fish names. The name of a fish may be used multiple times to add multiple of that fish to the tank. Those fish specified first will be rendered in front of those listed later. This flag is optional, but who wants a tank with no fish?
+Fish are added to the tank using the `-f` or `--fish` flag followed by any number of fish names. The name of a fish may be used multiple times to add multiple of that fish to the tank. Those fish specified first will be rendered in front of those listed later. This flag is optional, but who wants a tank with no fish?
 ```
 -f <fish_0> ... <fish_n>
 ```
@@ -120,7 +120,7 @@ See an [example](#example-fish).
 The forward\_animation and flipped\_animation [animations](#animations) should contain an identical number of identically sized frames.
 
 ## Adding Ducks
-Ducks are added to the tank using the `-d` flag followed by any number of duck names. The name of a duck may be used multiple times to add multiple of that duck to the tank. Those ducks specified first will be rendered in front of those listed later. This flag is optional, but it shouldn't be.
+Ducks are added to the tank using the `-d` or `--ducks` flag followed by any number of duck names. The name of a duck may be used multiple times to add multiple of that duck to the tank. Those ducks specified first will be rendered in front of those listed later. This flag is optional, but it shouldn't be.
 ```
 -d <duck_0> ... <duck_n>
 ```
@@ -148,7 +148,7 @@ The forward\_animation and flipped\_animation [animations](#animations) should c
 
 ## Adjusting Frame Speed
 
-The delay between frames can be modified using the `-s` flag followed by the desired delay between frames in ms. The default delay is 200ms.
+The delay between frames can be modified using the `-s` or `--speed` flag followed by the desired delay between frames in ms. The default delay is 200ms.
 ```
 -s <delay_ms>
 ```
