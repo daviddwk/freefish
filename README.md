@@ -56,9 +56,11 @@ $ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
 
 ## Help
 
+The help text can be displayed by using the `-h` or `--help` flags.
+
 ## Initializing
 
-Initializing freefish using `-i` or `--init` creates the following directories.
+Initializing freefish using the `-i` or `--init` flags creates the following directories.
 - `~/.config/freefish/tanks`
 - `~/.config/freefish/fish`
 - `~/.config/freefish/ducks`
