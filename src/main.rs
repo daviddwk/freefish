@@ -109,15 +109,14 @@ fn main() {
         let tank_files = read_dir("./config/tanks").unwrap();
         let duck_files = read_dir("./config/ducks").unwrap();
 
-        for asset_files in [(fish_files, "fish"), (tank_files, "tanks"), (duck_files, "ducks")] {
+        for asset_files in [(fish_files, "FISH:"), (tank_files, "TANKS:"), (duck_files, "DUCKS:")] {
             println!("{}", asset_files.1);
             for file in asset_files.0 {
                 match file {
                     Err(e) => panic!("{}", e),
                     Ok(f) =>
                         if f.path().extension() == Some(OsStr::new("json")) {
-                            // should use file_prefix instead of file_name, but is experimental
-                            println!(" {}", f.path().file_name().unwrap().to_str().unwrap()); 
+                            println!("    {}", f.path().file_stem().unwrap().to_str().unwrap()); 
                         },
                 };
             }
