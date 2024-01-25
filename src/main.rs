@@ -2,6 +2,7 @@ use std::process::exit;
 use std::time::{Duration, SystemTime};
 use std::io::stdout;
 use std::ffi::OsStr;
+use std::path::PathBuf;
 use std::fs::{
     create_dir, 
     create_dir_all,
@@ -77,42 +78,32 @@ struct Opt {
 fn main() {
     let args = Opt::from_args();
     let freefish_dir = home::home_dir().unwrap().join(".config").join("freefish");
-    let fish_dir = freefish_dir.join("fish");
-    let tanks_dir = freefish_dir.join("tanks");
-    let ducks_dir = freefish_dir.join("ducks");
+    let init_dir = PathBuf::from("./config");
+    let asset_types = ["tanks", "fish", "ducks"];
     
     if args.init {
         create_dir_all(freefish_dir.clone()).unwrap();
-        for asset_dir in [&fish_dir, &tanks_dir, &ducks_dir] {
-            if !asset_dir.exists() {
-                create_dir(asset_dir).unwrap();
+        for asset_type in asset_types {
+            if !freefish_dir.join(asset_type).exists() {
+                create_dir(freefish_dir.join(asset_type)).unwrap();
+            }
+            for file in read_dir(init_dir.join(asset_type)).unwrap() {
+                let f = &file.unwrap();
+                copy(f.path(), freefish_dir.join(asset_type).join(f.file_name())).unwrap();
             }
         }
-        let fish_init = read_dir("./config/fish").unwrap();
-        let tank_init = read_dir("./config/tanks").unwrap();
-        let duck_init = read_dir("./config/ducks").unwrap();
-        for asset_files in [(fish_init, &fish_dir), (tank_init, &tanks_dir), (duck_init, &ducks_dir)] {
-            for file in asset_files.0 {
-                match file {
-                    Err(e) => panic!("{}", e),
-                    Ok(f) => copy(&f.path(), asset_files.1.join(f.file_name())).unwrap(),
-                };
-            }
-        }
+        // make args.list = true here?
         exit(0);
     }
 
     if args.list {
-        for asset_files in [(fish_dir, "FISH:"), (tanks_dir, "TANKS:"), (ducks_dir, "DUCKS:")] {
-            println!("{}", asset_files.1);
-            for file in read_dir(asset_files.0.clone()).unwrap() {
-                match file {
-                    Err(e) => panic!("{}", e),
-                    Ok(f) =>
-                        if f.path().extension() == Some(OsStr::new("json")) {
-                            println!("    {}", f.path().file_stem().unwrap().to_str().unwrap()); 
-                        },
-                };
+        for asset_type in asset_types {
+            println!("{}:", asset_type.to_uppercase());
+            for file in read_dir(freefish_dir.join(asset_type)).unwrap() {
+                let f = &file.unwrap();
+                if f.path().extension() == Some(OsStr::new("json")) {
+                    println!("    {}", f.path().file_stem().unwrap().to_str().unwrap()); 
+                }
             }
         }
         exit(0);
@@ -122,15 +113,15 @@ fn main() {
         error("A tank was not provided", 1);
     }
 
-    let mut tank: Tank = Tank::new(&tanks_dir, &args.tank.unwrap());
+    let mut tank: Tank = Tank::new(&freefish_dir.join("tanks"), &args.tank.unwrap());
     let mut fishies: Vec<Fish> = Vec::new();
     let mut duckies: Vec<Duck> = Vec::new();
 
     for arg in args.fish {
-        fishies.push(Fish::new(&fish_dir, &arg, &tank));
+        fishies.push(Fish::new(&freefish_dir.join("fish"), &arg, &tank));
     }
     for arg in args.ducks {
-        duckies.push(Duck::new(&ducks_dir, &arg, &tank));
+        duckies.push(Duck::new(&freefish_dir.join("ducks"), &arg, &tank));
     }
     
     enable_raw_mode().unwrap();
