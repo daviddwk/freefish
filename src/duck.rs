@@ -29,9 +29,10 @@ impl Duck {
         let flip_anim = load_animation(&duck_json, &format!("duck {}", name), "/flipped_animation");
         let size = (duck_anim[0].len(), duck_anim[0][0].len());
         let mut buoyancy: usize = 0;
-        
         if duck_json["buoyancy"].is_u64() {
             buoyancy = usize::try_from(duck_json["buoyancy"].as_u64().unwrap()).unwrap();
+        } else if !duck_json["buoyancy"].is_null() {
+            error(&format!("duck {} /bouyancy is not a whole number", name), 1); 
         }
 
         if duck_anim.len() != flip_anim.len(){

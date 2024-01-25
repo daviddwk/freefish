@@ -1,4 +1,6 @@
 extern crate serde_json;
+use serde_json::json;
+
 use crossterm::style::Color;
 
 use color_glyph::ColorGlyph;
@@ -8,44 +10,46 @@ pub type Animation = Vec<Vec<Vec<ColorGlyph>>>;
 
 pub fn load_animation(json: &serde_json::Value, name: &str, anim_key: &str) -> Animation {
     let mut out_anim: Animation = Vec::new();
-    let symbols = json.pointer(&format!("{}/symbols", anim_key))
-        .expect(&format!("{} should have symbols key", anim_key));
-    let colors = json.pointer(&format!("{}/colors", anim_key))
-        .expect(&format!("{} should have colors key", anim_key));
-    let highlights = json.pointer(&format!("{}/highlights", anim_key))
-        .expect(&format!("{} should have highlights key", anim_key));
 
-    check_format(&symbols, "symbols");
-    check_format(&colors, "colors");
-    check_format(&highlights, "highlights");
+    if json.pointer(anim_key).is_none() {
+        error(&format!("{} {} key is missing", name, anim_key), 1);
+    }
+
+    let symbols = json.pointer(&format!("{}/symbols", anim_key)).unwrap_or(&json!(null));
+    let colors = json.pointer(&format!("{}/colors", anim_key)).unwrap_or(&json!(null));
+    let highlights = json.pointer(&format!("{}/highlights", anim_key)).unwrap_or(&json!(null));
+
+    check_format(&symbols, &format!("{} {}/symbols", name, anim_key));
+    check_format(&colors, &format!("{} {}/colors", name, anim_key));
+    check_format(&highlights, &format!("{} {}highlights", name, anim_key));
 
     let num_frames = symbols.as_array().unwrap().len();
     let num_lines = symbols[0].as_array().unwrap().len();
     let num_symbols = symbols[0][0].as_str().unwrap().len();
 
-    check_array(&symbols, num_frames, &format!("{} symbols", name));
-    check_array(&colors, num_frames, &format!("{} colors", name));
-    check_array(&highlights, num_frames, &format!("{} highlights", name));
+    check_array(&symbols, num_frames, &format!("{} {}/symbols", name, anim_key));
+    check_array(&colors, num_frames, &format!("{} {}/colors", name, anim_key));
+    check_array(&highlights, num_frames, &format!("{} {}/highlights", name, anim_key));
 
     for frame_idx in 0..num_frames {
         let mut out_frame: Vec<Vec<ColorGlyph>> = Vec::new();
 
         check_array(&symbols[frame_idx], num_lines, 
-                    &format!("{} symbols[{}]", name, frame_idx));
+                    &format!("{} {}/symbols[{}]", name, anim_key, frame_idx));
         check_array(&colors[frame_idx], num_lines, 
-                    &format!("{} colors[{}]", name, frame_idx));
+                    &format!("{} {}/colors[{}]", name, anim_key, frame_idx));
         check_array(&highlights[frame_idx], num_lines, 
-                    &format!("{} highlights[{}]", name, frame_idx));
+                    &format!("{} {}/highlights[{}]", name, anim_key, frame_idx));
 
         for line_idx in 0..num_lines {
             let mut out_line: Vec<ColorGlyph> = Vec::new();
 
             check_string(&symbols[frame_idx][line_idx], num_symbols, 
-                         &format!("{} symbols[{}][{}]", name, frame_idx, line_idx));
+                         &format!("{} {}/symbols[{}][{}]", name, anim_key, frame_idx, line_idx));
             check_string(&colors[frame_idx][line_idx], num_symbols,
-                         &format!("{} colors[{}][{}]", name, frame_idx, line_idx));
+                         &format!("{} {}/colors[{}][{}]", name, anim_key, frame_idx, line_idx));
             check_string(&highlights[frame_idx][line_idx], num_symbols,
-                         &format!("{} highlights[{}][{}]", name, frame_idx, line_idx));
+                         &format!("{} {}/highlights[{}][{}]", name, anim_key, frame_idx, line_idx));
 
             let line = symbols[frame_idx][line_idx].as_str().unwrap();
 
@@ -74,6 +78,9 @@ pub fn load_animation(json: &serde_json::Value, name: &str, anim_key: &str) -> A
 }
 
 fn check_format(json_array: &serde_json::Value, name: &str) {
+    if json_array.is_null() {
+        error(&format!("{} key is missing", name), 1);
+    }
     if !json_array.is_array() { 
         error(&format!("{} is not an array", name), 1);
     }
