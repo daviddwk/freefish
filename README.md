@@ -34,15 +34,15 @@ $ ./target/debug/freefish -l
 The following output should be seen if freefish was initialized properly, possibly showing even more assets.
 
 ```
-fish
- guppy.json
- angel.json
- clown.json
-tanks
- box.json
- aquarium.json
-ducks
- duck.json
+FISH:
+    angel
+    clown
+    guppy
+TANKS:
+    aquarium
+    box
+DUCKS:
+    duck
 ```
 
 freefish should now be setup and ready for use, but don't forget to try adding your own custom tanks and creatures to `~/.config/freefish` aswell!
@@ -53,6 +53,8 @@ freefish is used to display a dynamic tank filled with various fish and ducks. T
 ```
 $ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
 ```
+
+## Help
 
 ## Initializing
 
