@@ -88,12 +88,10 @@ fn main() {
                 create_dir(asset_dir).unwrap();
             }
         }
-
-        let fish_files = read_dir("./config/fish").unwrap();
-        let tank_files = read_dir("./config/tanks").unwrap();
-        let duck_files = read_dir("./config/ducks").unwrap();
-
-        for asset_files in [(fish_files, &fish_dir), (tank_files, &tanks_dir), (duck_files, &ducks_dir)] {
+        let fish_init = read_dir("./config/fish").unwrap();
+        let tank_init = read_dir("./config/tanks").unwrap();
+        let duck_init = read_dir("./config/ducks").unwrap();
+        for asset_files in [(fish_init, &fish_dir), (tank_init, &tanks_dir), (duck_init, &ducks_dir)] {
             for file in asset_files.0 {
                 match file {
                     Err(e) => panic!("{}", e),
@@ -105,13 +103,9 @@ fn main() {
     }
 
     if args.list {
-        let fish_files = read_dir("./config/fish").unwrap();
-        let tank_files = read_dir("./config/tanks").unwrap();
-        let duck_files = read_dir("./config/ducks").unwrap();
-
-        for asset_files in [(fish_files, "FISH:"), (tank_files, "TANKS:"), (duck_files, "DUCKS:")] {
+        for asset_files in [(fish_dir, "FISH:"), (tanks_dir, "TANKS:"), (ducks_dir, "DUCKS:")] {
             println!("{}", asset_files.1);
-            for file in asset_files.0 {
+            for file in read_dir(asset_files.0.clone()).unwrap() {
                 match file {
                     Err(e) => panic!("{}", e),
                     Ok(f) =>
