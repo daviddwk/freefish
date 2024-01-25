@@ -64,7 +64,7 @@ struct Opt {
     #[structopt(short = "i", long = "init", help = "Copies assets from ./config to ~/.config/freefish/")]
     init: bool,
     #[structopt(short = "t", long = "tank", help = "Selects a tank")]
-    tank: String, 
+    tank: Option<String>, 
     #[structopt(short = "s", long = "speed", default_value = "200", help = "Sets the delay between frames in ms")]
     speed: u64,
     #[structopt(short = "f", long = "fish", help = "Adds the specified fish to your fish tank")]
@@ -125,7 +125,11 @@ fn main() {
         exit(0);
     }
     
-    let mut tank: Tank = Tank::new(&tanks_dir, &args.tank);
+    if args.tank.is_none() {
+        error("A tank was not provided", 1);
+    }
+
+    let mut tank: Tank = Tank::new(&tanks_dir, &args.tank.unwrap());
     let mut fishies: Vec<Fish> = Vec::new();
     let mut duckies: Vec<Duck> = Vec::new();
 
