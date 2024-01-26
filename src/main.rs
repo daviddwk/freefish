@@ -9,7 +9,6 @@ use std::fs::{
     read_dir, 
     copy
 };
-
 extern crate structopt;
 use structopt::StructOpt;
 
@@ -39,8 +38,8 @@ use crossterm::{
 };
 extern crate rand;
 extern crate home;
-extern crate serde_json;
 extern crate colored;
+extern crate serde_json;
 
 mod tank;
 use tank::Tank;
@@ -58,8 +57,6 @@ mod open_json;
 #[derive(StructOpt)]
 #[structopt(name = "freefish", version = "0.0.1", about = "Displays an animated fish tank to your terminal!")]
 struct Opt {
-    //#[structopt(short = "h", long = "help")]
-    //help: bool,
     #[structopt(short = "l", long = "list", help = "Lists available assets found in ~/.config/freefish/")]
     list: bool,
     #[structopt(short = "i", long = "init", help = "Copies assets from ./config to ~/.config/freefish/")]
@@ -72,47 +69,24 @@ struct Opt {
     fish: Vec<String>,
     #[structopt(short = "d", long = "ducks", help = "Adds the specified ducks to your fish tank")]
     ducks: Vec<String>,
-
 }
 
 fn main() {
     let args = Opt::from_args();
     let freefish_dir = home::home_dir().unwrap().join(".config").join("freefish");
     let init_dir = PathBuf::from("./config");
-    let asset_types = ["tanks", "fish", "ducks"];
-    
+
+    let asset_types = vec!["tanks", "fish", "ducks"];
     if args.init {
-        create_dir_all(freefish_dir.clone()).unwrap();
-        for asset_type in asset_types {
-            if !freefish_dir.join(asset_type).exists() {
-                create_dir(freefish_dir.join(asset_type)).unwrap();
-            }
-            for file in read_dir(init_dir.join(asset_type)).unwrap() {
-                let f = &file.unwrap();
-                copy(f.path(), freefish_dir.join(asset_type).join(f.file_name())).unwrap();
-            }
-        }
-        // make args.list = true here?
-        exit(0);
+        init_assets(&init_dir, &freefish_dir, &asset_types);
+    }
+    if args.list {
+        list_assets(&freefish_dir, &asset_types);
     }
 
-    if args.list {
-        for asset_type in asset_types {
-            println!("{}:", asset_type.to_uppercase());
-            for file in read_dir(freefish_dir.join(asset_type)).unwrap() {
-                let f = &file.unwrap();
-                if f.path().extension() == Some(OsStr::new("json")) {
-                    println!("    {}", f.path().file_stem().unwrap().to_str().unwrap()); 
-                }
-            }
-        }
-        exit(0);
-    }
-    
     if args.tank.is_none() {
         error("A tank was not provided", 1);
     }
-
     let mut tank: Tank = Tank::new(&freefish_dir.join("tanks"), &args.tank.unwrap());
     let mut fishies: Vec<Fish> = Vec::new();
     let mut duckies: Vec<Duck> = Vec::new();
@@ -124,11 +98,50 @@ fn main() {
         duckies.push(Duck::new(&freefish_dir.join("ducks"), &arg, &tank));
     }
     
-    enable_raw_mode().unwrap();
 
+    enable_raw_mode().unwrap();
     stdout().execute(Hide).unwrap();
     stdout().execute(Clear(crossterm::terminal::ClearType::All)).unwrap();
-    'render_loop: loop {
+
+    draw(&args.speed, &mut tank, &mut fishies, &mut duckies);
+    
+    stdout().execute(Show).unwrap();
+    disable_raw_mode().unwrap();
+    exit(0);
+}
+
+fn init_assets(from_dir: &PathBuf, to_dir: &PathBuf, asset_types: &Vec<&str>) {
+    create_dir_all(to_dir).unwrap();
+    for asset_type in asset_types {
+        if !to_dir.join(asset_type).exists() {
+            create_dir(to_dir.join(asset_type)).unwrap();
+        }
+        for file in read_dir(from_dir.join(asset_type)).unwrap() {
+            let f = &file.unwrap();
+            copy(f.path(), to_dir.join(asset_type).join(f.file_name())).unwrap();
+        }
+    }
+    // print somthing here
+    exit(0);
+}
+
+fn list_assets(asset_dir: &PathBuf, asset_types: &Vec<&str>) {
+    // TODO fix listing with no directories
+    // and other things where this is no freefish dir
+    for asset_type in asset_types {
+        println!("{}:", asset_type.to_uppercase());
+        for file in read_dir(asset_dir.join(asset_type)).unwrap() {
+            let f = &file.unwrap();
+            if f.path().extension() == Some(OsStr::new("json")) {
+                println!("    {}", f.path().file_stem().unwrap().to_str().unwrap()); 
+            }
+        }
+    }
+    exit(0);
+}
+
+fn draw(delay: &u64, tank: &mut Tank, fishies: &mut Vec<Fish>, duckies: &mut Vec<Duck>) {
+    loop {
         stdout().execute(MoveTo(0, 0)).unwrap();
         for row_idx in 0..tank.size.0 {
             for glyph_idx in 0..tank.size.1 {
@@ -173,7 +186,7 @@ fn main() {
         tank.update();
         
         // there must be a better way
-        let frame_duration = Duration::from_millis(args.speed);
+        let frame_duration = Duration::from_millis(*delay);
         let frame_start = SystemTime::now();
         let mut now = SystemTime::now();
         while now.duration_since(frame_start).unwrap() < frame_duration {
@@ -184,21 +197,17 @@ fn main() {
                         modifiers: KeyModifiers::NONE,
                         kind: KeyEventKind::Press,
                         state: KeyEventState::NONE,
-                    }) => break 'render_loop,
+                    }) => return,
                     Event::Key(KeyEvent {
                         code: KeyCode::Esc,
                         modifiers: KeyModifiers::NONE,
                         kind: KeyEventKind::Press,
                         state: KeyEventState::NONE,
-                    }) => break 'render_loop,
+                    }) => return,
                     _ => (),
                 }
             }
             now = SystemTime::now();
         }
     }
-    
-    stdout().execute(Show).unwrap();
-    disable_raw_mode().unwrap();
-    exit(0);
 }
