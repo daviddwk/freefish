@@ -144,7 +144,7 @@ See an [example](#example-duck).
 
 ### buoyancy
 
-The `buoyancy` key corresponds to a value that specifies the number of lines of the duck that should appear above the surface of the water. If this key is excluded the buoyancy defoults to 0, so the top of the duck will be at the top layer of water. 
+The `buoyancy` key corresponds to a value that specifies the number of lines of the duck that should appear above the surface of the water. If this key is excluded the buoyancy defaults to 0, so the top of the duck will be at the top layer of water. 
 
 ### forward\_animation & flipped animation
 
