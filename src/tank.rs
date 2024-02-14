@@ -3,12 +3,12 @@ use std::convert::TryFrom;
 
 use rand::Rng;
 
-use animation::{Animation, load_animation};
+use animation::{Animation, load_animation, Size};
 use error::error;
 use open_json::open_json;
 
 pub struct Tank {
-    pub size: (usize, usize),
+    pub size: Size,
     pub depth: usize,
     pub fg_frame: usize,
     pub bg_frame: usize,
@@ -31,7 +31,7 @@ impl Tank {
     
         let mut rng = rand::thread_rng();
         return Self {
-            size:     (fg_anim[0].len(), fg_anim[0][0].len()),
+            size: Size {height: fg_anim[0].len(), width: fg_anim[0][0].len()},
             depth,
             fg_frame: rng.gen_range(0..fg_anim.len()),
             bg_frame: rng.gen_range(0..bg_anim.len()),

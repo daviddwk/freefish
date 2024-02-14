@@ -6,6 +6,21 @@ use crossterm::style::Color;
 use color_glyph::ColorGlyph;
 use error::error;
 
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub struct Position {
+    pub x: usize,
+    pub y: usize,
+}
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub struct Size {
+    pub height: usize,
+    pub width: usize,
+}
+#[derive(Clone)]
+pub struct PositionRange {
+    pub x: std::ops::RangeInclusive<usize>,
+    pub y: std::ops::RangeInclusive<usize>,
+}
 pub type Animation = Vec<Vec<Vec<ColorGlyph>>>;
 
 pub fn load_animation(json: &serde_json::Value, name: &str, anim_key: &str) -> Animation {
@@ -137,20 +152,20 @@ fn match_color(color: char) -> Option<Color> {
     }
 }
 
-pub fn glyph_from_animation(anim: &Vec<Vec<Vec<ColorGlyph>>>, frame_idx: usize, row_idx: usize, glyph_idx: usize, position: (usize, usize)) -> Option<&ColorGlyph> {
+pub fn glyph_from_animation(anim: &Vec<Vec<Vec<ColorGlyph>>>, frame_idx: usize, row_idx: usize, glyph_idx: usize, position: Position) -> Option<&ColorGlyph> {
     let frame_idx_oob = frame_idx >= anim.len();
     if frame_idx_oob {
         error(&format!("Attempted to access frame out of bounds"), 1);
     }
-    let row_idx_oob = (row_idx < position.0) || (row_idx - position.0 >= anim[frame_idx].len());
+    let row_idx_oob = (row_idx < position.y) || (row_idx - position.y >= anim[frame_idx].len());
     if row_idx_oob {
         return None;
     }
-    let glyph_idx_oob = (glyph_idx < position.1) ||
-                        (glyph_idx - position.1 >= anim[frame_idx][row_idx - position.0].len()); 
+    let glyph_idx_oob = (glyph_idx < position.x) ||
+                        (glyph_idx - position.x >= anim[frame_idx][row_idx - position.y].len()); 
     if glyph_idx_oob {
         return None;
     }
-    return Some(&anim[frame_idx][row_idx - position.0][glyph_idx - position.1]);
+    return Some(&anim[frame_idx][row_idx - position.y][glyph_idx - position.x]);
 }
 
