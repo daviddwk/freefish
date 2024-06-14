@@ -19,7 +19,8 @@ use crossterm::{
     cursor::{
         Hide, 
         Show, 
-        MoveTo
+        MoveTo,
+        MoveRight
     },
     terminal::{
         Clear, 
@@ -50,25 +51,27 @@ mod duck;
 use duck::Duck;
 mod animation;
 mod color_glyph;
+use color_glyph::ColorGlyph;
 mod error;
 use error::error;
 mod open_json;
 
+
 #[derive(StructOpt)]
 #[structopt(name = "freefish", version = "0.0.1", about = "Displays an animated fish tank to your terminal!")]
 struct Opt {
-    #[structopt(short = "l", long = "list", help = "Lists available assets found in ~/.config/freefish/")]
-    list: bool,
-    #[structopt(short = "i", long = "init", help = "Copies assets from ./config to ~/.config/freefish/")]
-    init: bool,
-    #[structopt(short = "t", long = "tank", help = "Selects a tank")]
+    #[structopt(short = "t", long = "tank", help = "(REQUIRED) Selects a tank")]
     tank: Vec<String>, 
-    #[structopt(short = "s", long = "speed", default_value = "200", help = "Sets the delay between frames in ms")]
-    speed: u64,
     #[structopt(short = "f", long = "fish", help = "Adds the specified fish to your fish tank")]
     fish: Vec<String>,
     #[structopt(short = "d", long = "ducks", help = "Adds the specified ducks to your fish tank")]
     ducks: Vec<String>,
+    #[structopt(short = "s", long = "speed", default_value = "200", help = "Sets the delay between frames in ms")]
+    speed: u64,
+    #[structopt(short = "l", long = "list", help = "Lists available assets found in ~/.config/freefish/")]
+    list: bool,
+    #[structopt(short = "i", long = "init", help = "Copies assets from ./config to ~/.config/freefish/")]
+    init: bool,
 }
 
 struct Creatures {
@@ -151,38 +154,80 @@ fn load_tank(assets_dir: &PathBuf, asset_names: &HashMap<&str, &Vec<String>>) ->
 }
 
 fn draw(delay: &u64, tank: &mut Tank, creatures: &mut Creatures) {
+    let buffer_size = tank.size.height * tank.size.width;
+    let empty_color_glyph = ColorGlyph{glyph : ' ', foreground_color : None, background_color : None};
+    let mut frame_buffer_a = vec![empty_color_glyph.clone(); buffer_size];
+    let mut frame_buffer_b = vec![empty_color_glyph.clone(); buffer_size];
+    let mut current_buffer = true; // make enum
+    let mut active_buffer = &mut frame_buffer_a;
+    let mut prev_buffer = &mut frame_buffer_b;
     loop {
         stdout().execute(MoveTo(0, 0)).unwrap();
         for row_idx in 0..tank.size.height {
             for glyph_idx in 0..tank.size.width {
-                // blesh, do some weird generic programmeing here if you can 
-                let mut printed = draw_tank_char(tank, row_idx, glyph_idx);
+                let buffer_idx = row_idx * tank.size.width + glyph_idx;
+                let mut printed = false;
+                // make tank.fg.get_glyph
                 if !printed {
+                    if let Some(glyph) = tank.fg.get_glyph(row_idx, glyph_idx) {
+                        active_buffer[buffer_idx] = (*glyph).clone();
+                        printed = true;
+                    } 
+                }
+                if !printed {
+                    // make generic
                     for duck_idx in 0..creatures.duckies.len() {
                         if let Some(glyph) = creatures.duckies[duck_idx].get_glyph(row_idx, glyph_idx) {
-                            glyph.print();
+                            active_buffer[buffer_idx] = (*glyph).clone();
                             printed = true;
                             break;
                         }
                     }
                 }
                 if !printed {
+                    // make generic
                     for fish_idx in 0..creatures.fishies.len() {
                         if let Some(glyph) = creatures.fishies[fish_idx].get_glyph(row_idx, glyph_idx) {
-                            glyph.print();
+                            active_buffer[buffer_idx] = (*glyph).clone();
                             printed = true;
                             break;
                         }
                     }
                 }
                 if !printed {
-                    tank.bg_anim[tank.bg_frame][row_idx][glyph_idx].print();
+                    if let Some(glyph) = tank.bg.get_glyph(row_idx, glyph_idx) {
+                        active_buffer[buffer_idx] = (*glyph).clone();
+                    } else {
+                        active_buffer[buffer_idx] = empty_color_glyph.clone();
+                    } 
+                }
+            }
+        }
+
+        for row_idx in 0..tank.size.height {
+            for glyph_idx in 0..tank.size.width {
+                let buffer_idx = row_idx * tank.size.width + glyph_idx;
+                if active_buffer[buffer_idx] != prev_buffer[buffer_idx] {
+                    active_buffer[buffer_idx].print();
+                } else {
+                    stdout().execute(MoveRight(1)).unwrap();
                 }
             }
             if row_idx != tank.size.height - 1 {
                 print!("\r\n");
             }
         }
+        
+        current_buffer = !current_buffer;
+        if current_buffer {
+            active_buffer = &mut frame_buffer_a;
+            prev_buffer = &mut frame_buffer_b;
+        } else {
+            active_buffer = &mut frame_buffer_b;
+            prev_buffer = &mut frame_buffer_a;
+        }
+
+
         for fish in &mut creatures.fishies {
             fish.update();
         }
@@ -217,12 +262,4 @@ fn draw(delay: &u64, tank: &mut Tank, creatures: &mut Creatures) {
             now = SystemTime::now();
         }
     }
-}
-
-fn draw_tank_char(tank: &Tank, row_idx: usize, glyph_idx: usize) -> bool {
-    if tank.fg_anim[tank.fg_frame][row_idx][glyph_idx].glyph != ' ' {
-        tank.fg_anim[tank.fg_frame][row_idx][glyph_idx].print(); 
-        return true;
-    }
-    return false;
 }

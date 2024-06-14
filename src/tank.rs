@@ -3,17 +3,30 @@ use std::convert::TryFrom;
 
 use rand::Rng;
 
-use animation::{Animation, load_animation, Size};
+use animation::{Animation, load_animation, glyph_from_animation, Size, Position};
+use color_glyph::ColorGlyph;
 use error::error;
 use open_json::open_json;
+
+pub struct Layer {
+    frame: usize,
+    anim: Animation
+}
+impl Layer {
+    pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<&ColorGlyph> {
+        let glyph = glyph_from_animation(&self.anim, self.frame, row_idx, glyph_idx, Position{x: 0, y: 0});
+        if glyph.is_some() && glyph.as_ref().unwrap().glyph == ' ' {
+            return None;
+        }
+        return glyph;
+    }
+}
 
 pub struct Tank {
     pub size: Size,
     pub depth: usize,
-    pub fg_frame: usize,
-    pub bg_frame: usize,
-    pub fg_anim: Animation,
-    pub bg_anim: Animation
+    pub fg: Layer,
+    pub bg: Layer
 }
 impl Tank {
     pub fn new(path: &PathBuf, name: &str) -> Self {
@@ -33,16 +46,20 @@ impl Tank {
         return Self {
             size: Size {height: fg_anim[0].len(), width: fg_anim[0][0].len()},
             depth,
-            fg_frame: rng.gen_range(0..fg_anim.len()),
-            bg_frame: rng.gen_range(0..bg_anim.len()),
-            fg_anim, 
-            bg_anim,
+            fg: Layer{
+                frame: rng.gen_range(0..fg_anim.len()),
+                anim: fg_anim
+            },
+            bg: Layer{
+                frame: rng.gen_range(0..bg_anim.len()),
+                anim: bg_anim
+            }
         }
     }
     pub fn update(&mut self) {
-        self.fg_frame += 1;
-        self.bg_frame += 1;
-        if self.fg_frame >= self.fg_anim.len() { self.fg_frame = 0; }
-        if self.bg_frame >= self.bg_anim.len() { self.bg_frame = 0; }
+        self.fg.frame += 1;
+        self.bg.frame += 1;
+        if self.fg.frame >= self.fg.anim.len() { self.fg.frame = 0; }
+        if self.bg.frame >= self.bg.anim.len() { self.bg.frame = 0; }
     }
 }
