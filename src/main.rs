@@ -4,39 +4,16 @@ use std::io::stdout;
 use std::ffi::OsStr;
 use std::path::PathBuf;
 use std::collections::HashMap;
-use std::fs::{
-    create_dir, 
-    create_dir_all,
-    read_dir, 
-    copy
-};
+use std::fs::{create_dir, create_dir_all,read_dir, copy};
 extern crate structopt;
 use structopt::StructOpt;
 
 extern crate crossterm;
 use crossterm::{
     ExecutableCommand,
-    cursor::{
-        Hide, 
-        Show, 
-        MoveTo,
-        MoveRight
-    },
-    terminal::{
-        Clear, 
-        disable_raw_mode, 
-        enable_raw_mode
-    },
-    event::{
-        Event, 
-        poll, 
-        read, 
-        KeyCode, 
-        KeyEvent, 
-        KeyModifiers, 
-        KeyEventKind, 
-        KeyEventState
-    },
+    cursor::{Hide, Show, MoveTo},
+    terminal::{Clear, disable_raw_mode, enable_raw_mode},
+    event::{Event, poll, read, KeyCode, KeyEvent, KeyModifiers, KeyEventKind, KeyEventState},
 };
 extern crate rand;
 extern crate home;
@@ -102,12 +79,22 @@ fn main() {
         duckies: asset_names["ducks"].iter().map(|name| Duck::new(&freefish_dir.join("ducks"), name, &tank)).collect(),
     };
 
+    // init terminal
     enable_raw_mode().unwrap();
     stdout().execute(Hide).unwrap();
     stdout().execute(Clear(crossterm::terminal::ClearType::All)).unwrap();
-
-    draw(&args.speed, &mut tank, &mut creatures);
     
+    loop {
+        let frame = build_frame(&mut tank, &mut creatures);
+        // post processing goes here;
+        print_frame(&frame);
+        update_animations(&mut tank, &mut creatures);
+        if poll_input(Duration::from_millis(args.speed)) {
+            break;
+        }
+    }
+    
+    // return terminal
     stdout().execute(Show).unwrap();
     disable_raw_mode().unwrap();
     exit(0);
@@ -153,113 +140,92 @@ fn load_tank(assets_dir: &PathBuf, asset_names: &HashMap<&str, &Vec<String>>) ->
     return Tank::new(&assets_dir.join("tanks"), &asset_names["tanks"][0]);
 }
 
-fn draw(delay: &u64, tank: &mut Tank, creatures: &mut Creatures) {
-    let buffer_size = tank.size.height * tank.size.width;
+fn build_frame(tank: &mut Tank, creatures: &mut Creatures) -> Vec<Vec<ColorGlyph>> {
     let empty_color_glyph = ColorGlyph{glyph : ' ', foreground_color : None, background_color : None};
-    let mut frame_buffer_a = vec![empty_color_glyph.clone(); buffer_size];
-    let mut frame_buffer_b = vec![empty_color_glyph.clone(); buffer_size];
-    let mut current_buffer = true; // make enum
-    let mut active_buffer = &mut frame_buffer_a;
-    let mut prev_buffer = &mut frame_buffer_b;
-    loop {
-        stdout().execute(MoveTo(0, 0)).unwrap();
-        for row_idx in 0..tank.size.height {
-            for glyph_idx in 0..tank.size.width {
-                let buffer_idx = row_idx * tank.size.width + glyph_idx;
-                let mut printed = false;
-                // make tank.fg.get_glyph
-                if !printed {
-                    if let Some(glyph) = tank.fg.get_glyph(row_idx, glyph_idx) {
-                        active_buffer[buffer_idx] = (*glyph).clone();
+    let mut frame_buffer = vec![vec![empty_color_glyph.clone(); tank.size.width]; tank.size.height];
+    for row_idx in 0..tank.size.height {
+        for glyph_idx in 0..tank.size.width {
+            let mut printed = false;
+            if !printed {
+                if let Some(glyph) = tank.fg.get_glyph(row_idx, glyph_idx) {
+                    frame_buffer[row_idx][glyph_idx] = (*glyph).clone();
+                    printed = true;
+                } 
+            }
+            if !printed {
+                for duck_idx in 0..creatures.duckies.len() {
+                    if let Some(glyph) = creatures.duckies[duck_idx].get_glyph(row_idx, glyph_idx) {
+                        frame_buffer[row_idx][glyph_idx] = (*glyph).clone();
                         printed = true;
-                    } 
-                }
-                if !printed {
-                    // make generic
-                    for duck_idx in 0..creatures.duckies.len() {
-                        if let Some(glyph) = creatures.duckies[duck_idx].get_glyph(row_idx, glyph_idx) {
-                            active_buffer[buffer_idx] = (*glyph).clone();
-                            printed = true;
-                            break;
-                        }
+                        break;
                     }
-                }
-                if !printed {
-                    // make generic
-                    for fish_idx in 0..creatures.fishies.len() {
-                        if let Some(glyph) = creatures.fishies[fish_idx].get_glyph(row_idx, glyph_idx) {
-                            active_buffer[buffer_idx] = (*glyph).clone();
-                            printed = true;
-                            break;
-                        }
-                    }
-                }
-                if !printed {
-                    if let Some(glyph) = tank.bg.get_glyph(row_idx, glyph_idx) {
-                        active_buffer[buffer_idx] = (*glyph).clone();
-                    } else {
-                        active_buffer[buffer_idx] = empty_color_glyph.clone();
-                    } 
                 }
             }
-        }
-
-        for row_idx in 0..tank.size.height {
-            for glyph_idx in 0..tank.size.width {
-                let buffer_idx = row_idx * tank.size.width + glyph_idx;
-                if active_buffer[buffer_idx] != prev_buffer[buffer_idx] {
-                    active_buffer[buffer_idx].print();
+            if !printed {
+                for fish_idx in 0..creatures.fishies.len() {
+                    if let Some(glyph) = creatures.fishies[fish_idx].get_glyph(row_idx, glyph_idx) {
+                        frame_buffer[row_idx][glyph_idx] = (*glyph).clone();
+                        printed = true;
+                        break;
+                    }
+                }
+            }
+            if !printed {
+                if let Some(glyph) = tank.bg.get_glyph(row_idx, glyph_idx) {
+                    frame_buffer[row_idx][glyph_idx] = (*glyph).clone();
                 } else {
-                    stdout().execute(MoveRight(1)).unwrap();
-                }
+                    frame_buffer[row_idx][glyph_idx] = empty_color_glyph.clone();
+                } 
             }
-            if row_idx != tank.size.height - 1 {
-                print!("\r\n");
-            }
-        }
-        
-        current_buffer = !current_buffer;
-        if current_buffer {
-            active_buffer = &mut frame_buffer_a;
-            prev_buffer = &mut frame_buffer_b;
-        } else {
-            active_buffer = &mut frame_buffer_b;
-            prev_buffer = &mut frame_buffer_a;
-        }
-
-
-        for fish in &mut creatures.fishies {
-            fish.update();
-        }
-        for duck in &mut creatures.duckies {
-            duck.update();
-        }
-        tank.update();
-        
-        // there must be a better way
-        let frame_duration = Duration::from_millis(*delay);
-        let frame_start = SystemTime::now();
-        let mut now = SystemTime::now();
-        while now.duration_since(frame_start).unwrap() < frame_duration {
-            if poll(frame_duration - now.duration_since(frame_start).unwrap()).unwrap() {
-                match read().unwrap() {
-                    // TODO: Capital Q does not work here
-                    Event::Key(KeyEvent {
-                        code: KeyCode::Char('q'),
-                        modifiers: KeyModifiers::NONE,
-                        kind: KeyEventKind::Press,
-                        state: KeyEventState::NONE,
-                    }) => return,
-                    Event::Key(KeyEvent {
-                        code: KeyCode::Esc,
-                        modifiers: KeyModifiers::NONE,
-                        kind: KeyEventKind::Press,
-                        state: KeyEventState::NONE,
-                    }) => return,
-                    _ => (),
-                }
-            }
-            now = SystemTime::now();
         }
     }
+    return frame_buffer;
+}
+
+fn print_frame(frame_buffer: &Vec<Vec<ColorGlyph>>) {
+    stdout().execute(MoveTo(0, 0)).unwrap();
+    for frame in frame_buffer.iter() {
+        for glyph in frame.iter() {
+            glyph.print();
+        }
+        print!("\r\n");
+    }
+
+}
+
+fn update_animations(tank: &mut Tank, creatures: &mut Creatures) { 
+    for fish in &mut creatures.fishies {
+        fish.update();
+    }
+    for duck in &mut creatures.duckies {
+        duck.update();
+    }
+    tank.update();
+}
+
+fn poll_input(duration: Duration) -> bool {
+    let frame_start = SystemTime::now();
+    let mut now = SystemTime::now();
+    while now.duration_since(frame_start).unwrap() < duration {
+        if poll(duration - now.duration_since(frame_start).unwrap()).unwrap() {
+            match read().unwrap() {
+                // TODO: Capital Q does not work here
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('q'),
+                    modifiers: KeyModifiers::NONE,
+                    kind: KeyEventKind::Press,
+                    state: KeyEventState::NONE,
+                }) => return true,
+                Event::Key(KeyEvent {
+                    code: KeyCode::Esc,
+                    modifiers: KeyModifiers::NONE,
+                    kind: KeyEventKind::Press,
+                    state: KeyEventState::NONE,
+                }) => return true,
+                _ => (),
+            }
+        }
+        now = SystemTime::now();
+    }
+    return false;
 }
