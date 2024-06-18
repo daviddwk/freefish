@@ -4,6 +4,8 @@ use crossterm::{
     style::{Color, SetForegroundColor, SetBackgroundColor}
 };
 
+#[derive(Clone)]
+#[derive(PartialEq, Debug)]
 pub struct ColorGlyph {
     pub glyph: char,
     pub foreground_color: Option<Color>,
