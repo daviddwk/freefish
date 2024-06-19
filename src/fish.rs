@@ -13,6 +13,7 @@ use open_json::open_json;
 pub struct Fish {
     pos: Position,
     dest: Position,
+    size: Size,
     pos_range: PositionRange,
     flip: bool,
     frame: usize,
@@ -47,6 +48,7 @@ impl Fish {
         return Self {
             pos:        random_position(&pos_range),
             dest:       random_position(&pos_range),
+            size,
             pos_range,
             flip:       rng.gen::<bool>(),
             frame:      rng.gen_range(0..fish_anim.len()),
@@ -54,7 +56,7 @@ impl Fish {
             flip_anim, 
         }
     }
-    pub fn update(&mut self) {
+    pub fn update(&mut self, tank: &Tank) {
         self.frame += 1;
         if self.frame == self.fish_anim.len() {
             self.frame = 0;
@@ -72,6 +74,10 @@ impl Fish {
             self.flip = true;
         }
         if self.pos == self.dest {
+            self.pos_range = PositionRange {
+                x: 0..=tank.size.width - self.size.width,
+                y: 0 + tank.depth..=tank.size.height - self.size.height,
+            };
             self.dest = random_position(&self.pos_range);
         }
     }

@@ -75,7 +75,7 @@ $ freefish -l
 ```
 
 ## Selecting a Tank
-A tank is specified with the `-t` or `--tank` flag followed by the name of a single tank.
+A tank is specified with the `-t` or `--tank` flag followed by the name of a single tank. If a tank is not provided, the entire terminal will used.
 ```
 -t <tank>
 ```

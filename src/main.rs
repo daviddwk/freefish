@@ -12,7 +12,7 @@ extern crate crossterm;
 use crossterm::{
     ExecutableCommand,
     cursor::{Hide, Show, MoveTo},
-    terminal::{Clear, disable_raw_mode, enable_raw_mode},
+    terminal::{Clear, disable_raw_mode, enable_raw_mode, size},
     event::{Event, poll, read, KeyCode, KeyEvent, KeyModifiers, KeyEventKind, KeyEventState},
 };
 extern crate rand;
@@ -22,11 +22,13 @@ extern crate serde_json;
 
 mod tank;
 use tank::Tank;
+use tank::Layer;
 mod fish;
 use fish::Fish;
 mod duck;
 use duck::Duck;
 mod animation;
+use animation::Size;
 mod color_glyph;
 use color_glyph::ColorGlyph;
 mod error;
@@ -131,17 +133,30 @@ fn list_assets(asset_dir: &PathBuf, assets: &HashMap<&str, &Vec<String>>) {
 }
 
 fn load_tank(assets_dir: &PathBuf, asset_names: &HashMap<&str, &Vec<String>>) -> Tank {
-    if asset_names["tanks"].len() < 1 {
-        error("A tank was not provided", 1);
-    }
-    else if asset_names["tanks"].len() > 1 {
+    if asset_names["tanks"].len() > 1 {
         error("Too many tanks were provided", 1);
+    }
+    if asset_names["tanks"].len() < 1 {
+        let terminal_size = crossterm::terminal::size().unwrap();
+        let empty_color_glyph = ColorGlyph{glyph: ' ', foreground_color: None, background_color: None};
+        return Tank{
+            size: Size{width: terminal_size.0 as usize, height: (terminal_size.1 - 1) as usize},
+            depth: 0,
+            fg: Layer {
+                frame: 0, 
+                anim: vec![vec![vec![empty_color_glyph.clone(); terminal_size.0 as usize]; (terminal_size.1 - 1) as usize]; 1],
+            },
+            bg: Layer {
+                frame: 0, 
+                anim: vec![vec![vec![empty_color_glyph.clone(); terminal_size.0 as usize]; (terminal_size.1 - 1) as usize]; 1],
+            },
+        }
     }
     return Tank::new(&assets_dir.join("tanks"), &asset_names["tanks"][0]);
 }
 
 fn build_frame(tank: &mut Tank, creatures: &mut Creatures) -> Vec<Vec<ColorGlyph>> {
-    let empty_color_glyph = ColorGlyph{glyph : ' ', foreground_color : None, background_color : None};
+    let empty_color_glyph = ColorGlyph{glyph: ' ', foreground_color: None, background_color: None};
     let mut frame_buffer = vec![vec![empty_color_glyph.clone(); tank.size.width]; tank.size.height];
     for row_idx in 0..tank.size.height {
         for glyph_idx in 0..tank.size.width {
@@ -194,13 +209,13 @@ fn print_frame(frame_buffer: &Vec<Vec<ColorGlyph>>) {
 }
 
 fn update_animations(tank: &mut Tank, creatures: &mut Creatures) { 
+    tank.update();
     for fish in &mut creatures.fishies {
-        fish.update();
+        fish.update(&tank);
     }
     for duck in &mut creatures.duckies {
-        duck.update();
+        duck.update(&tank);
     }
-    tank.update();
 }
 
 fn poll_input(duration: Duration) -> bool {
