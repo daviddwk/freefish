@@ -89,17 +89,17 @@ impl Duck {
         }
     }
 
-    pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<&ColorGlyph> {
-        let glyph: Option<&ColorGlyph>;
+    pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<ColorGlyph> {
+        let mut animation: &Animation = &self.duck_anim;
         if self.flip {
-            glyph = glyph_from_animation(&self.flip_anim, self.frame, row_idx, glyph_idx, self.pos);
-        } else {
-            glyph = glyph_from_animation(&self.duck_anim, self.frame, row_idx, glyph_idx, self.pos);
+            animation = &self.flip_anim;
         }
-        if glyph.is_some() && glyph.unwrap().glyph == ' ' {
-            return None;
+        if let Some(glyph) = glyph_from_animation(animation, self.frame, row_idx, glyph_idx, self.pos) {
+            if glyph.glyph != ' ' {
+                return Some(glyph);
+            }
         }
-        return glyph;    
+        return None;
     }
 }
 

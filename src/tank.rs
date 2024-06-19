@@ -3,31 +3,19 @@ use std::convert::TryFrom;
 
 use rand::Rng;
 
-use animation::{Animation, load_animation, glyph_from_animation, Size, Position};
+use animation::{Animation, load_animation, glyph_from_animation, Size, Position, blank_animation};
 use color_glyph::ColorGlyph;
 use error::error;
 use open_json::open_json;
-
-pub struct Layer {
-    pub frame: usize,
-    pub anim: Animation
-}
-impl Layer {
-    pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<&ColorGlyph> {
-        let glyph = glyph_from_animation(&self.anim, self.frame, row_idx, glyph_idx, Position{x: 0, y: 0});
-        if glyph.is_some() && glyph.as_ref().unwrap().glyph == ' ' {
-            return None;
-        }
-        return glyph;
-    }
-}
 
 pub struct Tank {
     pub dynamic_size: bool,
     pub size: Size,
     pub depth: usize,
-    pub fg: Layer,
-    pub bg: Layer,
+    pub fg_anim: Animation,
+    pub fg_frame: usize,
+    pub bg_anim: Animation,
+    pub bg_frame: usize,
 }
 impl Tank {
     pub fn new(path: &PathBuf, name: &str) -> Self {
@@ -48,14 +36,10 @@ impl Tank {
             size: Size {height: fg_anim[0].len(), width: fg_anim[0][0].len()},
             dynamic_size: false,
             depth,
-            fg: Layer{
-                frame: rng.gen_range(0..fg_anim.len()),
-                anim: fg_anim
-            },
-            bg: Layer{
-                frame: rng.gen_range(0..bg_anim.len()),
-                anim: bg_anim
-            }
+            fg_frame: rng.gen_range(0..fg_anim.len()),
+            fg_anim,
+            bg_frame: rng.gen_range(0..bg_anim.len()),
+            bg_anim,
         }
     }
     pub fn update(&mut self) {
@@ -63,21 +47,27 @@ impl Tank {
             let terminal_size = crossterm::terminal::size().unwrap();
             let new_size = Size{width: terminal_size.0 as usize, height: (terminal_size.1 - 1) as usize};
             if self.size != new_size {
-                let empty_color_glyph = ColorGlyph{glyph: ' ', foreground_color: None, background_color: None};
                 self.size = new_size;
-                self.fg = Layer {
-                    frame: 0, 
-                    anim: vec![vec![vec![empty_color_glyph.clone(); terminal_size.0 as usize]; (terminal_size.1 - 1) as usize]; 1],
-                };
-                self.bg = Layer {
-                    frame: 0, 
-                    anim: vec![vec![vec![empty_color_glyph.clone(); terminal_size.0 as usize]; (terminal_size.1 - 1) as usize]; 1],
-                };
+                self.fg_anim = blank_animation(new_size);
+                self.bg_anim = blank_animation(new_size);
             }
         }
-        self.fg.frame += 1;
-        self.bg.frame += 1;
-        if self.fg.frame >= self.fg.anim.len() { self.fg.frame = 0; }
-        if self.bg.frame >= self.bg.anim.len() { self.bg.frame = 0; }
+        self.fg_frame += 1;
+        self.bg_frame += 1;
+        if self.fg_frame >= self.fg_anim.len() { self.fg_frame = 0; }
+        if self.bg_frame >= self.bg_anim.len() { self.bg_frame = 0; }
+    }
+    pub fn get_fg_glyph(&mut self, row_idx: usize, glyph_idx: usize) -> Option<ColorGlyph> {
+        let position = Position{x: 0, y: 0};
+        if let Some(glyph) = glyph_from_animation(&self.fg_anim, self.fg_frame, row_idx, glyph_idx, position) {
+            if glyph.glyph != ' ' {
+                return Some(glyph);
+            }
+        }
+        return None;
+    }
+    pub fn get_bg_glyph(&mut self, row_idx: usize, glyph_idx: usize) -> Option<ColorGlyph> {
+        let position = Position{x: 0, y: 0};
+        return glyph_from_animation(&self.bg_anim, self.bg_frame, row_idx, glyph_idx, position);
     }
 }

@@ -22,13 +22,12 @@ extern crate serde_json;
 
 mod tank;
 use tank::Tank;
-use tank::Layer;
 mod fish;
 use fish::Fish;
 mod duck;
 use duck::Duck;
 mod animation;
-use animation::Size;
+use animation::{Size, blank_animation};
 mod color_glyph;
 use color_glyph::{ColorGlyph, EMPTY_COLOR_GLYPH};
 mod error;
@@ -142,14 +141,10 @@ fn load_tank(assets_dir: &PathBuf, tank_names: &Vec<String>) -> Tank {
             size: tank_size,
             dynamic_size: true,
             depth: 0,
-            fg: Layer {
-                frame: 0, 
-                anim: animation::blank_animation(tank_size),
-            },
-            bg: Layer {
-                frame: 0, 
-                anim: animation::blank_animation(tank_size),
-            },
+            fg_anim: blank_animation(tank_size),
+            fg_frame: 0,
+            bg_anim: blank_animation(tank_size),
+            bg_frame: 0,
         }
     }
     if tank_names.len() > 1 {
@@ -162,38 +157,26 @@ fn build_frame(tank: &mut Tank, creatures: &mut Creatures) -> Vec<Vec<ColorGlyph
     let mut frame_buffer = vec![vec![EMPTY_COLOR_GLYPH; tank.size.width]; tank.size.height];
     for row_idx in 0..tank.size.height {
         for glyph_idx in 0..tank.size.width {
-            let mut printed = false;
-            if !printed {
-                if let Some(glyph) = tank.fg.get_glyph(row_idx, glyph_idx) {
-                    frame_buffer[row_idx][glyph_idx] = (*glyph).clone();
-                    printed = true;
-                } 
-            }
-            if !printed {
-                for duck_idx in 0..creatures.duckies.len() {
-                    if let Some(glyph) = creatures.duckies[duck_idx].get_glyph(row_idx, glyph_idx) {
-                        frame_buffer[row_idx][glyph_idx] = (*glyph).clone();
-                        printed = true;
-                        break;
-                    }
+            let mut glyph: Option<ColorGlyph> = tank.get_fg_glyph(row_idx, glyph_idx);
+            if glyph.is_none() {
+                for duck in creatures.duckies.iter() {
+                    glyph = duck.get_glyph(row_idx, glyph_idx);
+                    if glyph.is_some() { break; }
                 }
             }
-            if !printed {
-                for fish_idx in 0..creatures.fishies.len() {
-                    if let Some(glyph) = creatures.fishies[fish_idx].get_glyph(row_idx, glyph_idx) {
-                        frame_buffer[row_idx][glyph_idx] = (*glyph).clone();
-                        printed = true;
-                        break;
-                    }
+            if glyph.is_none() {
+                for fish in creatures.fishies.iter() {
+                    glyph = fish.get_glyph(row_idx, glyph_idx);
+                    if glyph.is_some() { break; }
                 }
             }
-            if !printed {
-                if let Some(glyph) = tank.bg.get_glyph(row_idx, glyph_idx) {
-                    frame_buffer[row_idx][glyph_idx] = (*glyph).clone();
-                } else {
-                    frame_buffer[row_idx][glyph_idx] = EMPTY_COLOR_GLYPH;
-                } 
+            if glyph.is_none() {
+                glyph = tank.get_bg_glyph(row_idx, glyph_idx);
             }
+            if glyph.is_none() {
+                error(&format!("build_frame found no glyph at index [{}][{}]", row_idx, glyph_idx), 1);
+            } 
+            frame_buffer[row_idx][glyph_idx] = glyph.unwrap();
         }
     }
     return frame_buffer;

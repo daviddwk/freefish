@@ -156,7 +156,7 @@ fn match_color(color: char) -> Option<Color> {
     }
 }
 
-pub fn glyph_from_animation(anim: &Vec<Vec<Vec<ColorGlyph>>>, frame_idx: usize, row_idx: usize, glyph_idx: usize, position: Position) -> Option<&ColorGlyph> {
+pub fn glyph_from_animation(anim: &Vec<Vec<Vec<ColorGlyph>>>, frame_idx: usize, row_idx: usize, glyph_idx: usize, position: Position) -> Option<ColorGlyph> {
     let frame_idx_oob = frame_idx >= anim.len();
     if frame_idx_oob {
         error(&format!("Attempted to access frame out of bounds"), 1);
@@ -170,6 +170,6 @@ pub fn glyph_from_animation(anim: &Vec<Vec<Vec<ColorGlyph>>>, frame_idx: usize, 
     if glyph_idx_oob {
         return None;
     }
-    return Some(&anim[frame_idx][row_idx - position.y][glyph_idx - position.x]);
+    return Some(anim[frame_idx][row_idx - position.y][glyph_idx - position.x].clone());
 }
 
