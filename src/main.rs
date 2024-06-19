@@ -84,6 +84,7 @@ fn main() {
     // init terminal
     enable_raw_mode().unwrap();
     stdout().execute(Hide).unwrap();
+    stdout().execute(crossterm::terminal::DisableLineWrap).unwrap();
     stdout().execute(Clear(crossterm::terminal::ClearType::All)).unwrap();
     
     loop {
@@ -97,6 +98,7 @@ fn main() {
     }
     
     // return terminal
+    stdout().execute(crossterm::terminal::EnableLineWrap).unwrap();
     stdout().execute(Show).unwrap();
     disable_raw_mode().unwrap();
     exit(0);
@@ -141,6 +143,7 @@ fn load_tank(assets_dir: &PathBuf, asset_names: &HashMap<&str, &Vec<String>>) ->
         let empty_color_glyph = ColorGlyph{glyph: ' ', foreground_color: None, background_color: None};
         return Tank{
             size: Size{width: terminal_size.0 as usize, height: (terminal_size.1 - 1) as usize},
+            dynamic_size: true,
             depth: 0,
             fg: Layer {
                 frame: 0, 
