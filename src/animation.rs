@@ -3,7 +3,7 @@ use serde_json::json;
 
 use crossterm::style::Color;
 
-use color_glyph::ColorGlyph;
+use color_glyph::{ColorGlyph, EMPTY_COLOR_GLYPH};
 use error::error;
 
 #[derive(Clone, Copy, Eq, PartialEq)]
@@ -22,6 +22,10 @@ pub struct PositionRange {
     pub y: std::ops::RangeInclusive<usize>,
 }
 pub type Animation = Vec<Vec<Vec<ColorGlyph>>>;
+
+pub fn blank_animation(size: Size) -> Animation {
+     return vec![vec![vec![EMPTY_COLOR_GLYPH; size.width as usize]; (size.height) as usize]; 1];
+}
 
 pub fn load_animation(json: &serde_json::Value, name: &str, anim_key: &str) -> Animation {
     let mut out_anim: Animation = Vec::new();

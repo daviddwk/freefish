@@ -12,6 +12,8 @@ use open_json::open_json;
 pub struct Duck {
     pos: Position,
     dest: Position,
+    size: Size,
+    buoyancy: usize,
     pos_range: PositionRange,
     flip: bool,
     frame: usize,
@@ -52,6 +54,8 @@ impl Duck {
         return Self {
             pos:        random_position(&pos_range),
             dest:       random_position(&pos_range),
+            size,
+            buoyancy,
             pos_range,
             flip:       rng.gen::<bool>(),
             frame:      rng.gen_range(0..duck_anim.len()),
@@ -59,7 +63,7 @@ impl Duck {
             flip_anim,
         }
     }
-    pub fn update(&mut self) {
+    pub fn update(&mut self, tank: &Tank) {
         self.frame += 1;
         if self.frame == self.duck_anim.len() {
             self.frame = 0;
@@ -77,6 +81,10 @@ impl Duck {
             self.flip = true;
         }
         if self.pos == self.dest {
+            self.pos_range = PositionRange {
+                x: 0..=tank.size.width - self.size.width,
+                y: tank.depth - self.buoyancy..=tank.depth - self.buoyancy, // goofy
+            };
             self.dest = random_position(&self.pos_range);
         }
     }

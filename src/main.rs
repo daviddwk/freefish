@@ -12,7 +12,7 @@ extern crate crossterm;
 use crossterm::{
     ExecutableCommand,
     cursor::{Hide, Show, MoveTo},
-    terminal::{Clear, disable_raw_mode, enable_raw_mode},
+    terminal::{Clear, disable_raw_mode, enable_raw_mode, size},
     event::{Event, poll, read, KeyCode, KeyEvent, KeyModifiers, KeyEventKind, KeyEventState},
 };
 extern crate rand;
@@ -22,13 +22,15 @@ extern crate serde_json;
 
 mod tank;
 use tank::Tank;
+use tank::Layer;
 mod fish;
 use fish::Fish;
 mod duck;
 use duck::Duck;
 mod animation;
+use animation::Size;
 mod color_glyph;
-use color_glyph::ColorGlyph;
+use color_glyph::{ColorGlyph, EMPTY_COLOR_GLYPH};
 mod error;
 use error::error;
 mod open_json;
@@ -73,7 +75,7 @@ fn main() {
         list_assets(&freefish_dir, &asset_names);
     }
 
-    let mut tank = load_tank(&freefish_dir, &asset_names); 
+    let mut tank = load_tank(&freefish_dir, asset_names["tanks"]); 
     let mut creatures = Creatures {
         fishies: asset_names["fish"].iter().map(|name| Fish::new(&freefish_dir.join("fish"), name, &tank)).collect(),
         duckies: asset_names["ducks"].iter().map(|name| Duck::new(&freefish_dir.join("ducks"), name, &tank)).collect(),
@@ -82,6 +84,7 @@ fn main() {
     // init terminal
     enable_raw_mode().unwrap();
     stdout().execute(Hide).unwrap();
+    stdout().execute(crossterm::terminal::DisableLineWrap).unwrap();
     stdout().execute(Clear(crossterm::terminal::ClearType::All)).unwrap();
     
     loop {
@@ -95,6 +98,7 @@ fn main() {
     }
     
     // return terminal
+    stdout().execute(crossterm::terminal::EnableLineWrap).unwrap();
     stdout().execute(Show).unwrap();
     disable_raw_mode().unwrap();
     exit(0);
@@ -130,19 +134,32 @@ fn list_assets(asset_dir: &PathBuf, assets: &HashMap<&str, &Vec<String>>) {
     exit(0);
 }
 
-fn load_tank(assets_dir: &PathBuf, asset_names: &HashMap<&str, &Vec<String>>) -> Tank {
-    if asset_names["tanks"].len() < 1 {
-        error("A tank was not provided", 1);
+fn load_tank(assets_dir: &PathBuf, tank_names: &Vec<String>) -> Tank {
+    if tank_names.len() < 1 {
+        let terminal_size = crossterm::terminal::size().unwrap();
+        let tank_size = Size{width: terminal_size.0 as usize, height: (terminal_size.1 - 1) as usize};
+        return Tank{
+            size: tank_size,
+            dynamic_size: true,
+            depth: 0,
+            fg: Layer {
+                frame: 0, 
+                anim: animation::blank_animation(tank_size),
+            },
+            bg: Layer {
+                frame: 0, 
+                anim: animation::blank_animation(tank_size),
+            },
+        }
     }
-    else if asset_names["tanks"].len() > 1 {
+    if tank_names.len() > 1 {
         error("Too many tanks were provided", 1);
     }
-    return Tank::new(&assets_dir.join("tanks"), &asset_names["tanks"][0]);
+    return Tank::new(&assets_dir.join("tanks"), &tank_names[0]);
 }
 
 fn build_frame(tank: &mut Tank, creatures: &mut Creatures) -> Vec<Vec<ColorGlyph>> {
-    let empty_color_glyph = ColorGlyph{glyph : ' ', foreground_color : None, background_color : None};
-    let mut frame_buffer = vec![vec![empty_color_glyph.clone(); tank.size.width]; tank.size.height];
+    let mut frame_buffer = vec![vec![EMPTY_COLOR_GLYPH; tank.size.width]; tank.size.height];
     for row_idx in 0..tank.size.height {
         for glyph_idx in 0..tank.size.width {
             let mut printed = false;
@@ -174,7 +191,7 @@ fn build_frame(tank: &mut Tank, creatures: &mut Creatures) -> Vec<Vec<ColorGlyph
                 if let Some(glyph) = tank.bg.get_glyph(row_idx, glyph_idx) {
                     frame_buffer[row_idx][glyph_idx] = (*glyph).clone();
                 } else {
-                    frame_buffer[row_idx][glyph_idx] = empty_color_glyph.clone();
+                    frame_buffer[row_idx][glyph_idx] = EMPTY_COLOR_GLYPH;
                 } 
             }
         }
@@ -194,13 +211,13 @@ fn print_frame(frame_buffer: &Vec<Vec<ColorGlyph>>) {
 }
 
 fn update_animations(tank: &mut Tank, creatures: &mut Creatures) { 
+    tank.update();
     for fish in &mut creatures.fishies {
-        fish.update();
+        fish.update(&tank);
     }
     for duck in &mut creatures.duckies {
-        duck.update();
+        duck.update(&tank);
     }
-    tank.update();
 }
 
 fn poll_input(duration: Duration) -> bool {
