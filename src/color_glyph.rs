@@ -12,6 +12,8 @@ pub struct ColorGlyph {
     pub background_color: Option<Color>,
 }
 
+pub const EMPTY_COLOR_GLYPH: ColorGlyph = ColorGlyph{glyph: ' ', foreground_color: None, background_color: None};
+
 impl ColorGlyph {
     pub fn print(&self) {
         stdout().execute(SetForegroundColor(Color::Reset)).unwrap();
