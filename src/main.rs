@@ -26,8 +26,8 @@ mod fish;
 use fish::Fish;
 mod duck;
 use duck::Duck;
-//mod crab;
-//use crab::Crab;
+mod crab;
+use crab::Crab;
 mod animation;
 use animation::{Size, blank_animation};
 mod color_glyph;
@@ -46,6 +46,8 @@ struct Opt {
     fish: Vec<String>,
     #[structopt(short = "d", long = "ducks", help = "Adds the specified ducks to your fish tank")]
     ducks: Vec<String>,
+    #[structopt(short = "c", long = "crabs", help = "Adds the specified crabs to your fish tank")]
+    crabs: Vec<String>,
     #[structopt(short = "s", long = "speed", default_value = "200", help = "Sets the delay between frames in ms")]
     speed: u64,
     #[structopt(short = "l", long = "list", help = "Lists available assets found in ~/.config/freefish/")]
@@ -57,6 +59,7 @@ struct Opt {
 struct Creatures {
     fishies: Vec<Fish>,
     duckies: Vec<Duck>,
+    crabies: Vec<Crab>,
 }
 
 fn main() {
@@ -72,6 +75,7 @@ fn main() {
         asset_names.insert("tanks", &args.tank);
         asset_names.insert("fish", &args.fish);
         asset_names.insert("ducks", &args.ducks);
+        asset_names.insert("crabs", &args.crabs);
 
         if args.init {
             init_assets(&init_dir, &freefish_dir, &asset_names);
@@ -84,6 +88,7 @@ fn main() {
         creatures = Creatures {
             fishies: asset_names["fish"].iter().map(|name| Fish::new(&freefish_dir.join("fish"), name, &tank)).collect(),
             duckies: asset_names["ducks"].iter().map(|name| Duck::new(&freefish_dir.join("ducks"), name, &tank)).collect(),
+            crabies: asset_names["crabs"].iter().map(|name| Crab::new(&freefish_dir.join("crabs"), name, &tank)).collect(),
         };
     }
     // init terminal
@@ -172,6 +177,12 @@ fn build_frame(tank: &mut Tank, creatures: &mut Creatures) -> Vec<Vec<ColorGlyph
                 }
             }
             if glyph.is_none() {
+                for crab in creatures.crabies.iter() {
+                    glyph = crab.get_glyph(row_idx, glyph_idx);
+                    if glyph.is_some() { break; }
+                }
+            }
+            if glyph.is_none() {
                 for fish in creatures.fishies.iter() {
                     glyph = fish.get_glyph(row_idx, glyph_idx);
                     if glyph.is_some() { break; }
@@ -202,11 +213,14 @@ fn print_frame(frame_buffer: &Vec<Vec<ColorGlyph>>) {
 
 fn update_animations(tank: &mut Tank, creatures: &mut Creatures) { 
     tank.update();
+    for duck in &mut creatures.duckies {
+        duck.update(&tank);
+    }
     for fish in &mut creatures.fishies {
         fish.update(&tank);
     }
-    for duck in &mut creatures.duckies {
-        duck.update(&tank);
+    for crab in &mut creatures.crabies {
+        crab.update(&tank);
     }
 }
 
