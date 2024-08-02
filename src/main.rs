@@ -26,6 +26,8 @@ mod fish;
 use fish::Fish;
 mod duck;
 use duck::Duck;
+//mod crab;
+//use crab::Crab;
 mod animation;
 use animation::{Size, blank_animation};
 mod color_glyph;
@@ -59,33 +61,38 @@ struct Creatures {
 
 fn main() {
     let args = Opt::from_args();
-    let freefish_dir = home::home_dir().unwrap().join(".config").join("freefish");
-    let init_dir = PathBuf::from("./config");
+    // init assets
+    let mut creatures;
+    let mut tank;
+    {
+        let freefish_dir = home::home_dir().unwrap().join(".config").join("freefish");
+        let init_dir = PathBuf::from("./config");
 
-    let mut asset_names: HashMap<&str, &Vec<String>> = HashMap::new();
-    asset_names.insert("tanks", &args.tank);
-    asset_names.insert("fish", &args.fish);
-    asset_names.insert("ducks", &args.ducks);
+        let mut asset_names: HashMap<&str, &Vec<String>> = HashMap::new();
+        asset_names.insert("tanks", &args.tank);
+        asset_names.insert("fish", &args.fish);
+        asset_names.insert("ducks", &args.ducks);
 
-    if args.init {
-        init_assets(&init_dir, &freefish_dir, &asset_names);
+        if args.init {
+            init_assets(&init_dir, &freefish_dir, &asset_names);
+        }
+        if args.list {
+            list_assets(&freefish_dir, &asset_names);
+        }
+
+        tank = load_tank(&freefish_dir, asset_names["tanks"]); 
+        creatures = Creatures {
+            fishies: asset_names["fish"].iter().map(|name| Fish::new(&freefish_dir.join("fish"), name, &tank)).collect(),
+            duckies: asset_names["ducks"].iter().map(|name| Duck::new(&freefish_dir.join("ducks"), name, &tank)).collect(),
+        };
     }
-    if args.list {
-        list_assets(&freefish_dir, &asset_names);
-    }
-
-    let mut tank = load_tank(&freefish_dir, asset_names["tanks"]); 
-    let mut creatures = Creatures {
-        fishies: asset_names["fish"].iter().map(|name| Fish::new(&freefish_dir.join("fish"), name, &tank)).collect(),
-        duckies: asset_names["ducks"].iter().map(|name| Duck::new(&freefish_dir.join("ducks"), name, &tank)).collect(),
-    };
-
     // init terminal
     enable_raw_mode().unwrap();
     stdout().execute(Hide).unwrap();
     stdout().execute(crossterm::terminal::DisableLineWrap).unwrap();
     stdout().execute(Clear(crossterm::terminal::ClearType::All)).unwrap();
     
+    // main loop
     loop {
         let frame = build_frame(&mut tank, &mut creatures);
         // post processing goes here;
@@ -96,7 +103,7 @@ fn main() {
         }
     }
     
-    // return terminal
+    // return terminal to regular state
     stdout().execute(crossterm::terminal::EnableLineWrap).unwrap();
     stdout().execute(Show).unwrap();
     disable_raw_mode().unwrap();

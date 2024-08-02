@@ -46,8 +46,8 @@ impl Duck {
         if duck_anim[0].len() != flip_anim[0].len() || duck_anim[0][0].len() != flip_anim[0][0].len() {
             error(&format!("duck {} has a mismatch in duck and flip size", name), 1);
         }
-        if tank.depth < buoyancy {
-            error(&format!("duck {} does not fit in the tank\n try adding depth to the tank for headroom", name), 1);
+        if tank.depth < buoyancy || tank.size.height <= size.height + tank.depth || tank.size.width <= size.width{
+            error(&format!("duck {} does not fit in the tank try adding depth to the tank for headroom", name), 1);
         }
 
         let mut rng = rand::thread_rng();
