@@ -169,6 +169,8 @@ Crab asset files are stored in  `~/.config/freefish/crabs` and are `.json` files
     - `symbols`
     - `colors`
     - `highlights`
+ 
+See an [example](#example-crab).
 
 ### forward\_animation & flipped animation
 
@@ -345,6 +347,63 @@ The `colors` and `highlights` frames contain specific characters that bring colo
             ["     ",
              "     ",
              "     "]
+        ]
+    }
+}
+```
+## example crab
+```
+{
+    "forward_animation": {
+        "symbols": [
+            ["  \\/  ",
+             "=<``><",
+             " \"  \" "],
+            ["  \\/  ",
+             "=<``><",
+             " '''' "]
+        ],
+        "colors": [
+            ["  rr  ",
+             "rrrrrr",
+             " r  r "],
+            ["  rr  ",
+             "rrrrrr",
+             " rrrr "]
+        ],
+        "highlights": [
+            ["      ",
+             "      ",
+             "      "],
+            ["      ",
+             "      ",
+             "      "]
+        ]
+    },
+    "flipped_animation": {
+        "symbols": [
+            ["  \\/  ",
+             "><``>=",
+             " \"  \" "],
+            ["  \\/  ",
+             "><``>=",
+             " '''' "]
+        ],
+        "colors": [
+            ["  rr  ",
+             "rrrrrr",
+             " r  r "],
+            ["  rr  ",
+             "rrrrrr",
+             " rrrr "]
+        ],
+        "highlights": [
+            ["      ",
+             "      ",
+             "      "],
+            ["      ",
+             "      ",
+             "      "]
         ]
     }
 }
