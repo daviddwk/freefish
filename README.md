@@ -1,5 +1,5 @@
 # rustyfish
-A fish tank for your terminal that can be easily customized by creating new animated tanks, fish, and ducks. These assets are supplied as properly formatted `.json` files. This format makes creating colored frames of ASCII art simple.
+A fish tank for your terminal that can be easily customized by creating new animated tanks, fish, ducks, and crabs. These assets are supplied as properly formatted `.json` files. This format makes creating colored frames of ASCII art simple.
 
 ![example freefish](README.gif)
 
@@ -24,6 +24,7 @@ This creates the following folders, and populates them with the assets provided 
 - `~/.config/freefish/tanks`
 - `~/.config/freefish/fish`
 - `~/.config/freefish/ducks`
+- `~/.config/freefish/crabs`
 
 4. Test that freefish was initialized properly
 
@@ -43,15 +44,17 @@ TANKS:
     box
 DUCKS:
     duck
+CRABS:
+    crab
 ```
 
 freefish should now be setup and ready for use, but don't forget to try adding your own custom tanks and creatures to `~/.config/freefish` aswell!
 
 # Usage
-freefish is used to display a dynamic tank filled with various fish and ducks. This is done by using the tank, fish, and duck flags to specify available assets for display. These flags, and others, are further explained in this section.
+freefish is used to display a dynamic tank filled with various fish ducks and crabs. This is done by using the tank, fish, duck, and crab flags to specify available assets for display. These flags, and others, are further explained in this section.
 
 ```
-$ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck
+$ ./freefish -t aquarium -f guppy clown guppy guppy angel -d duck -c crab
 ```
 
 ## Help
@@ -64,6 +67,7 @@ Initializing freefish using the `-i` or `--init` flags creates the following dir
 - `~/.config/freefish/tanks`
 - `~/.config/freefish/fish`
 - `~/.config/freefish/ducks`
+- `~/.config/freefish/crabs`
   
 freefish will copy available assets from `./config`, if available, to populate the aforementioned directories. freefish should be initialized from the cloned directory to utilize the provided assets, but feel free to add your own assets to `~/.config/freefish`'s subdirectories manually!
 
@@ -145,6 +149,26 @@ See an [example](#example-duck).
 ### buoyancy
 
 The `buoyancy` key corresponds to a value that specifies the number of lines of the duck that should appear above the surface of the water. If this key is excluded the buoyancy defaults to 0, so the top of the duck will be at the top layer of water. 
+
+### forward\_animation & flipped animation
+
+The forward\_animation and flipped\_animation [animations](#animations) should contain an identical number of identically sized frames.
+
+## Adding Crabs
+Crabs are added to the tank using the `-c` or `--crab` flag followed by any number of crab names. The name of a crab may be used multiple times to add multiple of that crab to the tank. Those crabs specified first will be rendered in front of those listed later. This flag is optional.
+```
+-c <crab_0> ... <crab_n>
+```
+Crab asset files are stored in  `~/.config/freefish/crabs` and are `.json` files. These json files should contain the following key structure.
+
+- `forward_animation` (see [Animations](#animations))
+    - `symbols`
+    - `colors`
+    - `highlights`
+- `flipped_animation` (see [Animations](#animations))
+    - `symbols`
+    - `colors`
+    - `highlights`
 
 ### forward\_animation & flipped animation
 
