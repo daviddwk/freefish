@@ -1,8 +1,6 @@
 use std::path::PathBuf;
-use std::convert::TryFrom;
 
 use rand::Rng;
-
 use tank::Tank;
 use animation::{Animation, load_animation, Size, Position, glyph_from_animation, PositionRange};
 use color_glyph::*;
@@ -13,7 +11,6 @@ pub struct Crab {
     pos: Position,
     dest: Position,
     size: Size,
-    buoyancy: usize,
     pos_range: PositionRange,
     flip: bool,
     frame: usize,
@@ -27,13 +24,6 @@ impl Crab {
         let crab_anim = load_animation(&crab_json, &format!("crab {}", name), "/forward_animation");
         let flip_anim = load_animation(&crab_json, &format!("crab {}", name), "/flipped_animation");
         let size = Size { height: crab_anim[0].len(), width: crab_anim[0][0].len() };
-        let mut buoyancy: usize = 0;
-
-        if crab_json["buoyancy"].is_u64() {
-            buoyancy = usize::try_from(crab_json["buoyancy"].as_u64().unwrap()).unwrap();
-        } else if !crab_json["buoyancy"].is_null() {
-            error(&format!("crab {} /buoyancy is not a whole number", name), 1); 
-        }
 
         let pos_range = PositionRange {
             x: 0..=tank.size.width - size.width,
@@ -47,8 +37,8 @@ impl Crab {
             error(&format!("crab {} has a mismatch in crab and flip size", name), 1);
         }
         // TODO fix to just check size like fish
-        if tank.depth < buoyancy {
-            error(&format!("crab {} does not fit in the tank\n try adding depth to the tank for headroom", name), 1);
+        if tank.size.height < size.height || tank.size.width < size.width  {
+            error(&format!("crab {} is too large for tank", name), 1);
         }
 
         let mut rng = rand::thread_rng();
@@ -56,7 +46,6 @@ impl Crab {
             pos:        random_position(&pos_range),
             dest:       random_position(&pos_range),
             size,
-            buoyancy,
             pos_range,
             flip:       rng.gen::<bool>(),
             frame:      rng.gen_range(0..crab_anim.len()),

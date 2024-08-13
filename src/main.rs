@@ -12,7 +12,7 @@ extern crate crossterm;
 use crossterm::{
     ExecutableCommand,
     cursor::{Hide, Show, MoveTo},
-    terminal::{Clear, disable_raw_mode, enable_raw_mode, size},
+    terminal::{Clear, disable_raw_mode, enable_raw_mode},
     event::{Event, poll, read, KeyCode, KeyEvent, KeyModifiers, KeyEventKind, KeyEventState},
 };
 extern crate rand;

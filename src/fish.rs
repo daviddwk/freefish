@@ -41,7 +41,7 @@ impl Fish {
             error(&format!("fish {} has a mismatch in fish and flip size", name), 1);
         }
         
-        if tank.size.height <= size.height + tank.depth || tank.size.width <= size.width {
+        if tank.size.height < size.height + tank.depth || tank.size.width < size.width {
             error(&format!("fish {} too large for tank", name), 1);
         }
 
