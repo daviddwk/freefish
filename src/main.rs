@@ -115,7 +115,7 @@ fn main() {
         if no_assets(&asset_names) {
             error(
                 "No assets were specified\n
-                    Try '$freefish -f guppy -d duck -c crab -a aquarium'",
+                    Try '$ freefish -f guppy -d duck -c crab -a aquarium'",
                 -1,
             );
         }
@@ -198,7 +198,7 @@ fn list_assets(asset_dir: &PathBuf, assets: &HashMap<&str, &Vec<String>>) {
         if files.is_err() {
             error(
                 "Cannot list files in ~/.config/freefish\n
-                    Try '$freefish -i' to initialize",
+                    Try '$ freefish -i' to initialize",
                 -1,
             );
             exit(0);
