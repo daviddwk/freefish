@@ -1,4 +1,4 @@
-# rustyfish
+# freefish
 A fish tank for your terminal that can be easily customized by creating new animated tanks, fish, ducks, and crabs. These assets are supplied as properly formatted `.json` files. This format makes creating colored frames of ASCII art simple.
 
 ![example freefish](README.gif)
