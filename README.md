@@ -1,4 +1,4 @@
-# rustyfish
+# freefish
 A fish tank for your terminal that can be easily customized by creating new animated tanks, fish, ducks, and crabs. These assets are supplied as properly formatted `.json` files. This format makes creating colored frames of ASCII art simple.
 
 ![example freefish](README.gif)
@@ -11,13 +11,19 @@ $ cd rustyfish
 ```
 2. Build freefish
 ```
-$ cargo build
+$ cargo build --release
 ```
-3. Initialize freefish
+3. Move freefish
+
+This is optional, but will allow you to call freefish more easily.
+```
+# cp target/release/freefish /usr/local/bin/freefish
+```
+4. Initialize freefish
 
 freefish is initialized by running the binary with the init flag from from the cloned directory.
 ```
-$ ./target/debug/freefish -i
+$ freefish -i
 ```
 This creates the following folders, and populates them with the assets provided in the `config` folder.
 
@@ -26,7 +32,7 @@ This creates the following folders, and populates them with the assets provided 
 - `~/.config/freefish/ducks`
 - `~/.config/freefish/crabs`
 
-4. Test that freefish was initialized properly
+5. Test that freefish was initialized properly
 
 ```
 $ ./target/debug/freefish -l
