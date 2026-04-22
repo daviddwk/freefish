@@ -115,7 +115,7 @@ fn main() {
         if no_assets(&asset_names) {
             error(
                 "No assets were specified\n
-                    Try '$ freefish -f guppy -d duck -c crab -a aquarium'",
+                    Try '$ freefish -f guppy -d duck -c crab -t aquarium'",
                 -1,
             );
         }
