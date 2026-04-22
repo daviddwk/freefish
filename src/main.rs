@@ -31,7 +31,7 @@ use crab::Crab;
 mod animation;
 use animation::{blank_animation, Size};
 mod color_glyph;
-use color_glyph::{ColorGlyph, EMPTY_COLOR_GLYPH};
+use color_glyph::{ColorGlyph, HasColorGlyph, EMPTY_COLOR_GLYPH};
 mod error;
 use error::error;
 mod open_json;
@@ -242,28 +242,13 @@ fn build_frame(tank: &mut Tank, creatures: &mut Creatures) -> Vec<Vec<ColorGlyph
         for glyph_idx in 0..tank.size.width {
             let mut glyph: Option<ColorGlyph> = tank.get_fg_glyph(row_idx, glyph_idx);
             if glyph.is_none() {
-                for duck in creatures.duckies.iter() {
-                    glyph = duck.get_glyph(row_idx, glyph_idx);
-                    if glyph.is_some() {
-                        break;
-                    }
-                }
+                glyph = get_creature_glyph(creatures.duckies.iter(), row_idx, glyph_idx);
             }
             if glyph.is_none() {
-                for crab in creatures.crabies.iter() {
-                    glyph = crab.get_glyph(row_idx, glyph_idx);
-                    if glyph.is_some() {
-                        break;
-                    }
-                }
+                glyph = get_creature_glyph(creatures.crabies.iter(), row_idx, glyph_idx);
             }
             if glyph.is_none() {
-                for fish in creatures.fishies.iter() {
-                    glyph = fish.get_glyph(row_idx, glyph_idx);
-                    if glyph.is_some() {
-                        break;
-                    }
-                }
+                glyph = get_creature_glyph(creatures.fishies.iter(), row_idx, glyph_idx);
             }
             if glyph.is_none() {
                 glyph = tank.get_bg_glyph(row_idx, glyph_idx);
@@ -281,6 +266,20 @@ fn build_frame(tank: &mut Tank, creatures: &mut Creatures) -> Vec<Vec<ColorGlyph
         }
     }
     return frame_buffer;
+}
+
+fn get_creature_glyph<'a, T: HasColorGlyph + 'a>(
+    creature_iter: impl IntoIterator<Item = &'a T>,
+    row_idx: usize,
+    glyph_idx: usize,
+) -> Option<ColorGlyph> {
+    for creature in creature_iter {
+        let glyph = creature.get_glyph(row_idx, glyph_idx);
+        if glyph.is_some() {
+            return glyph;
+        }
+    }
+    return None;
 }
 
 fn print_frame(frame_buffer: &Vec<Vec<ColorGlyph>>) {

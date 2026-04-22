@@ -1,13 +1,13 @@
-use std::path::PathBuf;
 use std::convert::TryFrom;
+use std::path::PathBuf;
 
 use rand::Rng;
 
-use tank::Tank;
-use animation::{Animation, load_animation, Size, Position, glyph_from_animation, PositionRange};
+use animation::{glyph_from_animation, load_animation, Animation, Position, PositionRange, Size};
 use color_glyph::*;
 use error::error;
 use open_json::open_json;
+use tank::Tank;
 
 pub struct Duck {
     pos: Position,
@@ -23,16 +23,19 @@ pub struct Duck {
 
 impl Duck {
     pub fn new(path: &PathBuf, name: &str, tank: &Tank) -> Self {
-        let duck_json: serde_json::Value = open_json(path, name, "duck"); 
+        let duck_json: serde_json::Value = open_json(path, name, "duck");
         let duck_anim = load_animation(&duck_json, &format!("duck {}", name), "/forward_animation");
         let flip_anim = load_animation(&duck_json, &format!("duck {}", name), "/flipped_animation");
-        let size = Size { height: duck_anim[0].len(), width: duck_anim[0][0].len() };
+        let size = Size {
+            height: duck_anim[0].len(),
+            width: duck_anim[0][0].len(),
+        };
         let mut buoyancy: usize = 0;
 
         if duck_json["buoyancy"].is_u64() {
             buoyancy = usize::try_from(duck_json["buoyancy"].as_u64().unwrap()).unwrap();
         } else if !duck_json["buoyancy"].is_null() {
-            error(&format!("duck {} /buoyancy is not a whole number", name), 1); 
+            error(&format!("duck {} /buoyancy is not a whole number", name), 1);
         }
 
         let pos_range = PositionRange {
@@ -40,28 +43,45 @@ impl Duck {
             y: tank.depth - buoyancy..=tank.depth - buoyancy, // goofy
         };
 
-        if duck_anim.len() != flip_anim.len(){
-            error(&format!("duck {} has a mismatch in duck and flip length", name), 1);
+        if duck_anim.len() != flip_anim.len() {
+            error(
+                &format!("duck {} has a mismatch in duck and flip length", name),
+                1,
+            );
         }
-        if duck_anim[0].len() != flip_anim[0].len() || duck_anim[0][0].len() != flip_anim[0][0].len() {
-            error(&format!("duck {} has a mismatch in duck and flip size", name), 1);
+        if duck_anim[0].len() != flip_anim[0].len()
+            || duck_anim[0][0].len() != flip_anim[0][0].len()
+        {
+            error(
+                &format!("duck {} has a mismatch in duck and flip size", name),
+                1,
+            );
         }
-        if tank.depth < buoyancy || tank.size.height <= size.height + tank.depth || tank.size.width <= size.width{
-            error(&format!("duck {} does not fit in the tank try adding depth to the tank for headroom", name), 1);
+        if tank.depth < buoyancy
+            || tank.size.height <= size.height + tank.depth
+            || tank.size.width <= size.width
+        {
+            error(
+                &format!(
+                    "duck {} does not fit in the tank try adding depth to the tank for headroom",
+                    name
+                ),
+                1,
+            );
         }
 
         let mut rng = rand::thread_rng();
         return Self {
-            pos:        random_position(&pos_range),
-            dest:       random_position(&pos_range),
+            pos: random_position(&pos_range),
+            dest: random_position(&pos_range),
             size,
             buoyancy,
             pos_range,
-            flip:       rng.gen::<bool>(),
-            frame:      rng.gen_range(0..duck_anim.len()),
+            flip: rng.gen::<bool>(),
+            frame: rng.gen_range(0..duck_anim.len()),
             duck_anim,
             flip_anim,
-        }
+        };
     }
     pub fn update(&mut self, tank: &Tank) {
         self.frame += 1;
@@ -88,13 +108,17 @@ impl Duck {
             self.dest = random_position(&self.pos_range);
         }
     }
+}
 
-    pub fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<ColorGlyph> {
+impl HasColorGlyph for Duck {
+    fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<ColorGlyph> {
         let mut animation: &Animation = &self.duck_anim;
         if self.flip {
             animation = &self.flip_anim;
         }
-        if let Some(glyph) = glyph_from_animation(animation, self.frame, row_idx, glyph_idx, self.pos) {
+        if let Some(glyph) =
+            glyph_from_animation(animation, self.frame, row_idx, glyph_idx, self.pos)
+        {
             if glyph.glyph != ' ' {
                 return Some(glyph);
             }
@@ -104,10 +128,9 @@ impl Duck {
 }
 
 fn random_position(pos_range: &PositionRange) -> Position {
-    let mut rng = rand::thread_rng(); 
+    let mut rng = rand::thread_rng();
     return Position {
         x: rng.gen_range(pos_range.x.clone()),
         y: rng.gen_range(pos_range.y.clone()),
     };
 }
-

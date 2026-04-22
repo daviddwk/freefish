@@ -27,3 +27,7 @@ impl ColorGlyph {
         print!("{}", self.glyph);
     }
 }
+
+pub trait HasColorGlyph {
+    fn get_glyph(&self, row_idx: usize, glyph_idx: usize) -> Option<ColorGlyph>;
+}
